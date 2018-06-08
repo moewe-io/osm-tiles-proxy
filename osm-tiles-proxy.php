@@ -4,26 +4,26 @@
  * Plugin Name: OpenStreetMap Tiles Proxy
  * Plugin URI: https://github.com/moewe-io/osm-tiles-proxy
  * Description: Helper plugin for embedding OpenStreetMaps
- * Version: 1.0.0
+ * Version: 1.1.0
  * Author: MOEWE
  * Author URI: https://www.moewe.io/
  * Text Domain: osm-tiles-proxy
  */
 
 
-class MOEWE_OSM_Tiles_Proxy
-{
+class MOEWE_OSM_Tiles_Proxy {
 
-    function __construct()
-    {
+    function __construct() {
         add_action('rest_api_init', array($this, 'add_osm_proxy'));
+        if (is_admin()) {
+            add_filter('plugin_row_meta', array($this, 'init_row_meta'), 11, 2);
+        }
     }
 
 
-    function add_osm_proxy()
-    {
+    function add_osm_proxy() {
         register_rest_route('osm-tiles-proxy/v1', '/tiles/(?P<s>\w+)/(?P<z>\d+)/(?P<x>\d+)/(?P<y>\d+).png', array(
-            'methods' => 'GET',
+            'methods'  => 'GET',
             'callback' => array($this, 'get_osm_tile'),
         ));
     }
@@ -31,8 +31,7 @@ class MOEWE_OSM_Tiles_Proxy
     /**
      * @param $request WP_REST_Request
      */
-    function get_osm_tile($request)
-    {
+    function get_osm_tile($request) {
         // TODO Check referer
         // TODO Cache files locally
 
@@ -45,6 +44,36 @@ class MOEWE_OSM_Tiles_Proxy
         header('Content-Type: image/png');
         header('Cache-Control: public, max-age=604800'); // 1 week for no specific reason
         readfile($remote_url);
+    }
+
+    /**
+     * Add additional useful links.
+     *
+     * @param $links array Already existing links.
+     * @param $file string The current file.
+     * @return array Links including new ones.
+     */
+    function init_row_meta($links, $file) {
+        if (strpos($file, 'osm-tiles-proxy.php') !== false) {
+            ob_start();
+            $leaflet_base_url = plugins_url('/libs/leaflet/leaflet', $file);
+            $osm_tiles_url = rest_url('osm-tiles-proxy/v1/tiles/{s}/{z}/{x}/{y}.png');
+            ?>
+            <span class="notice notice-info" style="display: block;padding: 10px; margin-top: 5px;">
+                <strong><?php _e('Usage', 'osm-tiles-proxy') ?></strong>
+                <p>
+                <?php _e('Configure your OSM plugin to use the following urls instead.', 'osm-tiles-proxy') ?>
+                </p>
+                <table>
+                    <tr><th><?php _e('Tiles url', 'osm-tiles-proxy') ?></th><td><?php echo $osm_tiles_url ?></td></tr>
+                    <tr><th><?php _e('Leaflet CSS', 'osm-tiles-proxy') ?></th><td><?php echo $leaflet_base_url; ?>.css</td></tr>
+                    <tr><th><?php _e('Leaflet JS', 'osm-tiles-proxy') ?></th><td><?php echo $leaflet_base_url; ?>.js</td></tr>
+                </table>
+            </span>
+            <?php
+            $links[] = ob_get_clean();
+        }
+        return $links;
     }
 }
 
