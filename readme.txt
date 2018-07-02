@@ -17,7 +17,7 @@ Tiles Proxy for OpenStreetMap provides a basic proxy, which allows other OpenStr
 
 **Contribute**: [https://github.com/moewe-io/osm-tiles-proxy](https://github.com/moewe-io/osm-tiles-proxy)
 
-** Known to work with these plugins **
+**Known to work with these plugins**
 
 * [Leaflet Map](https://de.wordpress.org/plugins/leaflet-map/)
 * Another plugin? Let us [know](https://wordpress.org/support/plugin/osm-tiles-proxy).
@@ -40,7 +40,8 @@ Nothing special
 
 == Screenshots ==
 
-There is no ui or something like this. So no screenshots needed.
+1. Needed URLs are shown in the plugins overview
+2. Example usage with [Leaflet Map](https://de.wordpress.org/plugins/leaflet-map/)
 
 == Changelog ==
 

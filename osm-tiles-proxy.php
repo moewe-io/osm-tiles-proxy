@@ -56,7 +56,7 @@ class MOEWE_OSM_Tiles_Proxy {
             $base_path = dirname(wp_upload_dir()['basedir']) . '/cache/osm-tiles';
             $download_url = $this->get_osm_remote_url($matches['s'], $matches['z'], $matches['x'], $matches['y']);
 
-            $download_target = $base_path . '/' . $matches['s'] . '/' . $matches['z'] . '/' . $matches['x'] . '/';
+            $download_target = $base_path . '/' . $matches['s'] . '/' . $matches['z'] . '/' . $matches['xrexpr'] . '/';
 
             wp_mkdir_p($download_target);
             $download_target = $download_target . '/' . $matches['y'] . '.png';
