@@ -1,19 +1,19 @@
-=== OpenStreetMap Tiles Proxy ===
+=== Tiles Proxy for OpenStreetMap ===
 Contributors: adrian2k7,moewe, creabrain
 Tags: openstreetmap, embed, gdpr
 Donate link: https://www.moewe.io/
 Requires at least: 4.0
 Tested up to: 4.9.6
-Stable tag: 2.0.5
+Stable tag: 1.2.0
 Requires PHP: 7.0
 License: GPL v3
 License URI: http://www.gnu.org/copyleft/gpl.html
 
-OpenStreetMap Tiles Proxy provides a basic proxy, which allows other OpenStreetMap plugins to load map tiles from your server instead from OpenStreetMap servers.
+Tiles Proxy for OpenStreetMap provides a basic proxy, which allows other OpenStreetMap plugins to load map tiles from your server instead from OpenStreetMap servers.
 
 == Description ==
 
-OpenStreetMap Tiles Proxy provides a basic proxy, which allows other OpenStreetMap plugins to load map tiles from your server instead from OpenStreetMap servers.
+Tiles Proxy for OpenStreetMap provides a basic proxy, which allows other OpenStreetMap plugins to load map tiles from your server instead from OpenStreetMap servers.
 
 **Contribute**: [https://github.com/moewe-io/osm-tiles-proxy](https://github.com/moewe-io/osm-tiles-proxy)
 

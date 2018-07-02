@@ -1,8 +1,8 @@
 <?php
 
 /*
- * Plugin Name: OpenStreetMap Tiles Proxy
- * Plugin URI: https://github.com/moewe-io/osm-tiles-proxy
+ * Plugin Name: Tiles Proxy for OpenStreetMap
+ * Plugin URI: https://wordpress.org/plugins/osm-tiles-proxy
  * Description: Helper plugin for embedding OpenStreetMaps
  * Version: 1.2.0
  * Author: MOEWE
@@ -128,12 +128,12 @@ class MOEWE_OSM_Tiles_Proxy {
                 <?php } ?>
 
                 <tr>
-                    <th><?php _e('Leaflet CSS', 'osm-tiles-proxy') ?></th>
-                    <td><?php echo $leaflet_base_url; ?>.css</td>
-                </tr>
-                <tr>
                     <th><?php _e('Leaflet JS', 'osm-tiles-proxy') ?></th>
                     <td><?php echo $leaflet_base_url; ?>.js</td>
+                </tr>
+                <tr>
+                    <th><?php _e('Leaflet CSS', 'osm-tiles-proxy') ?></th>
+                    <td><?php echo $leaflet_base_url; ?>.css</td>
                 </tr>
             </table>
         </section>
