@@ -45,6 +45,11 @@ Nothing special
 
 == Changelog ==
 
+= 1.3.0 =
+
+* Updated leaflet.js to 1.3.4
+* Fix: Use WP_CONTENT_DIR instead of wp_upload_dir()
+
 = 1.2.0 =
 
 * Public release in WordPress repo

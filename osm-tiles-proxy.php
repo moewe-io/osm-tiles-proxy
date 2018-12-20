@@ -4,7 +4,7 @@
  * Plugin Name: Tiles Proxy for OpenStreetMap
  * Plugin URI: https://wordpress.org/plugins/osm-tiles-proxy
  * Description: Helper plugin for embedding OpenStreetMaps
- * Version: 1.2.0
+ * Version: 1.3.0
  * Author: MOEWE
  * Author URI: https://www.moewe.io/
  * Text Domain: osm-tiles-proxy
@@ -53,10 +53,10 @@ class MOEWE_OSM_Tiles_Proxy {
 
         if (preg_match_all($this->cache_404_pattern, $request, $matches, PREG_SET_ORDER, 0)) {
             $matches = $matches[0];
-            $base_path = dirname(wp_upload_dir()['basedir']) . '/cache/osm-tiles';
+            $base_path = WP_CONTENT_DIR . '/cache/osm-tiles';
             $download_url = $this->get_osm_remote_url($matches['s'], $matches['z'], $matches['x'], $matches['y']);
 
-            $download_target = $base_path . '/' . $matches['s'] . '/' . $matches['z'] . '/' . $matches['xrexpr'] . '/';
+            $download_target = $base_path . '/' . $matches['s'] . '/' . $matches['z'] . '/' . $matches['x'] . '/';
 
             wp_mkdir_p($download_target);
             $download_target = $download_target . '/' . $matches['y'] . '.png';
