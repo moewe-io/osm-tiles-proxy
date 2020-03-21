@@ -2,10 +2,9 @@
 Contributors: adrian2k7,moewe, creabrain
 Tags: openstreetmap, embed, gdpr
 Donate link: https://www.moewe.io/
-Requires at least: 4.0
-Tested up to: 4.9.6
-Stable tag: 1.2.0
-Requires PHP: 7.0
+Requires at least: 5.1
+Tested up to: 5.4
+Stable tag: 2.0.0
 License: GPL v3
 License URI: http://www.gnu.org/copyleft/gpl.html
 
@@ -42,8 +41,17 @@ Nothing special
 
 1. Needed URLs are shown in the plugins overview
 2. Example usage with [Leaflet Map](https://de.wordpress.org/plugins/leaflet-map/)
+3. Customizer overview
 
 == Changelog ==
+
+= 2.0.0 =
+
+* Updated Leaflet.js to 1.6.0
+* Added a new Customizer panel, which allows you to define some restrictions for downloaded tiles
+* Require PHP 7.2+, we urge everyone keep PHP updated and will stick to official end of security updates for PHP
+* Downloaded tiles will be cleared, when "entire cache" is cleared in WP Rocket
+* Downloaded tiles will be cleared, when cache is cleared in WP Fastest Cache
 
 = 1.3.0 =
 
