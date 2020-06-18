@@ -142,7 +142,7 @@ class Customizer {
 
 	function leaflet_map_loaded() {
 		if ( is_customize_preview() ) {
-			wp_enqueue_script( 'osm-proxy-customizer-preview', OSM_PROXY_BASE_URL . 'assets/customizer-preview.js', [ 'wp_leaflet_map' ], filemtime( OSM_PROXY_BASE_DIR . 'assets/customizer-preview.js' ), true );
+			wp_enqueue_script( 'osm-proxy-customizer-preview', OSM_PROXY_BASE_URL . 'assets/customizer-preview.js', ['wp_leaflet_map'], filemtime( OSM_PROXY_BASE_DIR . 'assets/customizer-preview.js' ), true );
 		}
 	}
 }

@@ -12,9 +12,7 @@ var version = "1.6.0+HEAD.0c81bdf";
  */
 
 var freeze = Object.freeze;
-Object.freeze = function (obj) {
-	return obj;
-};
+Object.freeze = function (obj) { return obj; };
 
 // @function extend(dest: Object, src?: Object): Object
 // Merges the properties of the `src` object (or multiple objects) into `dest` object and returns the latter. Has an `L.extend` shortcut.
@@ -33,9 +31,7 @@ function extend(dest) {
 // @function create(proto: Object, properties?: Object): Object
 // Compatibility polyfill for [Object.create](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object/create)
 var create = Object.create || (function () {
-	function F() {
-	}
-
+	function F() {}
 	return function (proto) {
 		F.prototype = proto;
 		return new F();
@@ -113,16 +109,14 @@ function throttle(fn, time, context) {
 // `range[1]` unless `includeMax` is set to `true`.
 function wrapNum(x, range, includeMax) {
 	var max = range[1],
-		min = range[0],
-		d = max - min;
+	    min = range[0],
+	    d = max - min;
 	return x === max && includeMax ? x : ((x - min) % d + d) % d + min;
 }
 
 // @function falseFn(): Function
 // Returns a function which always returns `false`.
-function falseFn() {
-	return false;
-}
+function falseFn() { return false; }
 
 // @function formatNum(num: Number, digits?: Number): Number
 // Returns the number `num` rounded to `digits` decimals, or to 6 decimals by default.
@@ -199,9 +193,7 @@ var isArray = Array.isArray || function (obj) {
 // Compatibility polyfill for [Array.prototype.indexOf](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array/indexOf)
 function indexOf(array, el) {
 	for (var i = 0; i < array.length; i++) {
-		if (array[i] === el) {
-			return i;
-		}
+		if (array[i] === el) { return i; }
 	}
 	return -1;
 }
@@ -223,7 +215,7 @@ var lastTime = 0;
 // fallback for IE 7-8
 function timeoutDefer(fn) {
 	var time = +new Date(),
-		timeToCall = Math.max(0, 16 - (time - lastTime));
+	    timeToCall = Math.max(0, 16 - (time - lastTime));
 
 	lastTime = time + timeToCall;
 	return window.setTimeout(fn, timeToCall);
@@ -231,9 +223,7 @@ function timeoutDefer(fn) {
 
 var requestFn = window.requestAnimationFrame || getPrefixed('RequestAnimationFrame') || timeoutDefer;
 var cancelFn = window.cancelAnimationFrame || getPrefixed('CancelAnimationFrame') ||
-	getPrefixed('CancelRequestAnimationFrame') || function (id) {
-		window.clearTimeout(id);
-	};
+		getPrefixed('CancelRequestAnimationFrame') || function (id) { window.clearTimeout(id); };
 
 // @function requestAnimFrame(fn: Function, context?: Object, immediate?: Boolean): Number
 // Schedules `fn` to be executed when the browser repaints. `fn` is bound to
@@ -291,8 +281,7 @@ var Util = (Object.freeze || Object)({
 
 // Thanks to John Resig and Dean Edwards for inspiration!
 
-function Class() {
-}
+function Class() {}
 
 Class.extend = function (props) {
 
@@ -350,9 +339,7 @@ Class.extend = function (props) {
 	// add method for calling all hooks
 	proto.callInitHooks = function () {
 
-		if (this._initHooksCalled) {
-			return;
-		}
+		if (this._initHooksCalled) { return; }
 
 		if (parentProto.callInitHooks) {
 			parentProto.callInitHooks.call(this);
@@ -398,9 +385,7 @@ Class.addInitHook = function (fn) { // (Function) || (String, args...)
 };
 
 function checkDeprecatedMixinEvents(includes) {
-	if (typeof L === 'undefined' || !L || !L.Mixin) {
-		return;
-	}
+	if (typeof L === 'undefined' || !L || !L.Mixin) { return; }
 
 	includes = isArray(includes) ? includes : [includes];
 
@@ -517,7 +502,7 @@ var Events = {
 			context = undefined;
 		}
 		var newListener = {fn: fn, ctx: context},
-			listeners = typeListeners;
+		    listeners = typeListeners;
 
 		// check if fn already there
 		for (var i = 0, len = listeners.length; i < len; i++) {
@@ -531,12 +516,10 @@ var Events = {
 
 	_off: function (type, fn, context) {
 		var listeners,
-			i,
-			len;
+		    i,
+		    len;
 
-		if (!this._events) {
-			return;
-		}
+		if (!this._events) { return; }
 
 		listeners = this._events[type];
 
@@ -563,9 +546,7 @@ var Events = {
 			// find fn and remove it
 			for (i = 0, len = listeners.length; i < len; i++) {
 				var l = listeners[i];
-				if (l.ctx !== context) {
-					continue;
-				}
+				if (l.ctx !== context) { continue; }
 				if (l.fn === fn) {
 
 					// set the removed listener to noop so that's not called if remove happens in fire
@@ -588,9 +569,7 @@ var Events = {
 	// object — the first argument of the listener function will contain its
 	// properties. The event can optionally be propagated to event parents.
 	fire: function (type, data, propagate) {
-		if (!this.listens(type, propagate)) {
-			return this;
-		}
+		if (!this.listens(type, propagate)) { return this; }
 
 		var event = extend({}, data, {
 			type: type,
@@ -624,16 +603,12 @@ var Events = {
 	// Returns `true` if a particular event type has any listeners attached to it.
 	listens: function (type, propagate) {
 		var listeners = this._events && this._events[type];
-		if (listeners && listeners.length) {
-			return true;
-		}
+		if (listeners && listeners.length) { return true; }
 
 		if (propagate) {
 			// also check parents for listeners if event propagates
 			for (var id in this._eventParents) {
-				if (this._eventParents[id].listens(type, propagate)) {
-					return true;
-				}
+				if (this._eventParents[id].listens(type, propagate)) { return true; }
 			}
 		}
 		return false;
@@ -652,14 +627,14 @@ var Events = {
 
 		var handler = bind(function () {
 			this
-				.off(types, fn, context)
-				.off(types, handler, context);
+			    .off(types, fn, context)
+			    .off(types, handler, context);
 		}, this);
 
 		// add a listener that's executed once and removed after that
 		return this
-			.on(types, fn, context)
-			.on(types, handler, context);
+		    .on(types, fn, context)
+		    .on(types, handler, context);
 	},
 
 	// @method addEventParent(obj: Evented): this
@@ -879,7 +854,7 @@ Point.prototype = {
 		point = toPoint(point);
 
 		var x = point.x - this.x,
-			y = point.y - this.y;
+		    y = point.y - this.y;
 
 		return Math.sqrt(x * x + y * y);
 	},
@@ -890,7 +865,7 @@ Point.prototype = {
 		point = toPoint(point);
 
 		return point.x === this.x &&
-			point.y === this.y;
+		       point.y === this.y;
 	},
 
 	// @method contains(otherPoint: Point): Boolean
@@ -899,15 +874,15 @@ Point.prototype = {
 		point = toPoint(point);
 
 		return Math.abs(point.x) <= Math.abs(this.x) &&
-			Math.abs(point.y) <= Math.abs(this.y);
+		       Math.abs(point.y) <= Math.abs(this.y);
 	},
 
 	// @method toString(): String
 	// Returns a string representation of the point for debugging purposes.
 	toString: function () {
 		return 'Point(' +
-			formatNum(this.x) + ', ' +
-			formatNum(this.y) + ')';
+		        formatNum(this.x) + ', ' +
+		        formatNum(this.y) + ')';
 	}
 };
 
@@ -963,9 +938,7 @@ function toPoint(x, y, round) {
  */
 
 function Bounds(a, b) {
-	if (!a) {
-		return;
-	}
+	if (!a) { return; }
 
 	var points = b ? [a, b] : a;
 
@@ -1000,8 +973,8 @@ Bounds.prototype = {
 	// Returns the center point of the bounds.
 	getCenter: function (round) {
 		return new Point(
-			(this.min.x + this.max.x) / 2,
-			(this.min.y + this.max.y) / 2, round);
+		        (this.min.x + this.max.x) / 2,
+		        (this.min.y + this.max.y) / 2, round);
 	},
 
 	// @method getBottomLeft(): Point
@@ -1056,9 +1029,9 @@ Bounds.prototype = {
 		}
 
 		return (min.x >= this.min.x) &&
-			(max.x <= this.max.x) &&
-			(min.y >= this.min.y) &&
-			(max.y <= this.max.y);
+		       (max.x <= this.max.x) &&
+		       (min.y >= this.min.y) &&
+		       (max.y <= this.max.y);
 	},
 
 	// @method intersects(otherBounds: Bounds): Boolean
@@ -1068,11 +1041,11 @@ Bounds.prototype = {
 		bounds = toBounds(bounds);
 
 		var min = this.min,
-			max = this.max,
-			min2 = bounds.min,
-			max2 = bounds.max,
-			xIntersects = (max2.x >= min.x) && (min2.x <= max.x),
-			yIntersects = (max2.y >= min.y) && (min2.y <= max.y);
+		    max = this.max,
+		    min2 = bounds.min,
+		    max2 = bounds.max,
+		    xIntersects = (max2.x >= min.x) && (min2.x <= max.x),
+		    yIntersects = (max2.y >= min.y) && (min2.y <= max.y);
 
 		return xIntersects && yIntersects;
 	},
@@ -1084,11 +1057,11 @@ Bounds.prototype = {
 		bounds = toBounds(bounds);
 
 		var min = this.min,
-			max = this.max,
-			min2 = bounds.min,
-			max2 = bounds.max,
-			xOverlaps = (max2.x > min.x) && (min2.x < max.x),
-			yOverlaps = (max2.y > min.y) && (min2.y < max.y);
+		    max = this.max,
+		    min2 = bounds.min,
+		    max2 = bounds.max,
+		    xOverlaps = (max2.x > min.x) && (min2.x < max.x),
+		    yOverlaps = (max2.y > min.y) && (min2.y < max.y);
 
 		return xOverlaps && yOverlaps;
 	},
@@ -1142,9 +1115,7 @@ function toBounds(a, b) {
  */
 
 function LatLngBounds(corner1, corner2) { // (LatLng, LatLng) or (LatLng[])
-	if (!corner1) {
-		return;
-	}
+	if (!corner1) { return; }
 
 	var latlngs = corner2 ? [corner1, corner2] : corner1;
 
@@ -1163,8 +1134,8 @@ LatLngBounds.prototype = {
 	// Extend the bounds to contain the given bounds
 	extend: function (obj) {
 		var sw = this._southWest,
-			ne = this._northEast,
-			sw2, ne2;
+		    ne = this._northEast,
+		    sw2, ne2;
 
 		if (obj instanceof LatLng) {
 			sw2 = obj;
@@ -1174,9 +1145,7 @@ LatLngBounds.prototype = {
 			sw2 = obj._southWest;
 			ne2 = obj._northEast;
 
-			if (!sw2 || !ne2) {
-				return this;
-			}
+			if (!sw2 || !ne2) { return this; }
 
 		} else {
 			return obj ? this.extend(toLatLng(obj) || toLatLngBounds(obj)) : this;
@@ -1201,21 +1170,21 @@ LatLngBounds.prototype = {
 	// Negative values will retract the bounds.
 	pad: function (bufferRatio) {
 		var sw = this._southWest,
-			ne = this._northEast,
-			heightBuffer = Math.abs(sw.lat - ne.lat) * bufferRatio,
-			widthBuffer = Math.abs(sw.lng - ne.lng) * bufferRatio;
+		    ne = this._northEast,
+		    heightBuffer = Math.abs(sw.lat - ne.lat) * bufferRatio,
+		    widthBuffer = Math.abs(sw.lng - ne.lng) * bufferRatio;
 
 		return new LatLngBounds(
-			new LatLng(sw.lat - heightBuffer, sw.lng - widthBuffer),
-			new LatLng(ne.lat + heightBuffer, ne.lng + widthBuffer));
+		        new LatLng(sw.lat - heightBuffer, sw.lng - widthBuffer),
+		        new LatLng(ne.lat + heightBuffer, ne.lng + widthBuffer));
 	},
 
 	// @method getCenter(): LatLng
 	// Returns the center point of the bounds.
 	getCenter: function () {
 		return new LatLng(
-			(this._southWest.lat + this._northEast.lat) / 2,
-			(this._southWest.lng + this._northEast.lng) / 2);
+		        (this._southWest.lat + this._northEast.lat) / 2,
+		        (this._southWest.lng + this._northEast.lng) / 2);
 	},
 
 	// @method getSouthWest(): LatLng
@@ -1280,8 +1249,8 @@ LatLngBounds.prototype = {
 		}
 
 		var sw = this._southWest,
-			ne = this._northEast,
-			sw2, ne2;
+		    ne = this._northEast,
+		    sw2, ne2;
 
 		if (obj instanceof LatLngBounds) {
 			sw2 = obj.getSouthWest();
@@ -1291,7 +1260,7 @@ LatLngBounds.prototype = {
 		}
 
 		return (sw2.lat >= sw.lat) && (ne2.lat <= ne.lat) &&
-			(sw2.lng >= sw.lng) && (ne2.lng <= ne.lng);
+		       (sw2.lng >= sw.lng) && (ne2.lng <= ne.lng);
 	},
 
 	// @method intersects(otherBounds: LatLngBounds): Boolean
@@ -1300,12 +1269,12 @@ LatLngBounds.prototype = {
 		bounds = toLatLngBounds(bounds);
 
 		var sw = this._southWest,
-			ne = this._northEast,
-			sw2 = bounds.getSouthWest(),
-			ne2 = bounds.getNorthEast(),
+		    ne = this._northEast,
+		    sw2 = bounds.getSouthWest(),
+		    ne2 = bounds.getNorthEast(),
 
-			latIntersects = (ne2.lat >= sw.lat) && (sw2.lat <= ne.lat),
-			lngIntersects = (ne2.lng >= sw.lng) && (sw2.lng <= ne.lng);
+		    latIntersects = (ne2.lat >= sw.lat) && (sw2.lat <= ne.lat),
+		    lngIntersects = (ne2.lng >= sw.lng) && (sw2.lng <= ne.lng);
 
 		return latIntersects && lngIntersects;
 	},
@@ -1316,12 +1285,12 @@ LatLngBounds.prototype = {
 		bounds = toLatLngBounds(bounds);
 
 		var sw = this._southWest,
-			ne = this._northEast,
-			sw2 = bounds.getSouthWest(),
-			ne2 = bounds.getNorthEast(),
+		    ne = this._northEast,
+		    sw2 = bounds.getSouthWest(),
+		    ne2 = bounds.getNorthEast(),
 
-			latOverlaps = (ne2.lat > sw.lat) && (sw2.lat < ne.lat),
-			lngOverlaps = (ne2.lng > sw.lng) && (sw2.lng < ne.lng);
+		    latOverlaps = (ne2.lat > sw.lat) && (sw2.lat < ne.lat),
+		    lngOverlaps = (ne2.lng > sw.lng) && (sw2.lng < ne.lng);
 
 		return latOverlaps && lngOverlaps;
 	},
@@ -1335,14 +1304,12 @@ LatLngBounds.prototype = {
 	// @method equals(otherBounds: LatLngBounds, maxMargin?: Number): Boolean
 	// Returns `true` if the rectangle is equivalent (within a small margin of error) to the given bounds. The margin of error can be overridden by setting `maxMargin` to a small number.
 	equals: function (bounds, maxMargin) {
-		if (!bounds) {
-			return false;
-		}
+		if (!bounds) { return false; }
 
 		bounds = toLatLngBounds(bounds);
 
 		return this._southWest.equals(bounds.getSouthWest(), maxMargin) &&
-			this._northEast.equals(bounds.getNorthEast(), maxMargin);
+		       this._northEast.equals(bounds.getNorthEast(), maxMargin);
 	},
 
 	// @method isValid(): Boolean
@@ -1416,15 +1383,13 @@ LatLng.prototype = {
 	// @method equals(otherLatLng: LatLng, maxMargin?: Number): Boolean
 	// Returns `true` if the given `LatLng` point is at the same position (within a small margin of error). The margin of error can be overridden by setting `maxMargin` to a small number.
 	equals: function (obj, maxMargin) {
-		if (!obj) {
-			return false;
-		}
+		if (!obj) { return false; }
 
 		obj = toLatLng(obj);
 
 		var margin = Math.max(
-			Math.abs(this.lat - obj.lat),
-			Math.abs(this.lng - obj.lng));
+		        Math.abs(this.lat - obj.lat),
+		        Math.abs(this.lng - obj.lng));
 
 		return margin <= (maxMargin === undefined ? 1.0E-9 : maxMargin);
 	},
@@ -1433,8 +1398,8 @@ LatLng.prototype = {
 	// Returns a string representation of the point (for debugging purposes).
 	toString: function (precision) {
 		return 'LatLng(' +
-			formatNum(this.lat, precision) + ', ' +
-			formatNum(this.lng, precision) + ')';
+		        formatNum(this.lat, precision) + ', ' +
+		        formatNum(this.lng, precision) + ')';
 	},
 
 	// @method distanceTo(otherLatLng: LatLng): Number
@@ -1453,17 +1418,18 @@ LatLng.prototype = {
 	// Returns a new `LatLngBounds` object in which each boundary is `sizeInMeters/2` meters apart from the `LatLng`.
 	toBounds: function (sizeInMeters) {
 		var latAccuracy = 180 * sizeInMeters / 40075017,
-			lngAccuracy = latAccuracy / Math.cos((Math.PI / 180) * this.lat);
+		    lngAccuracy = latAccuracy / Math.cos((Math.PI / 180) * this.lat);
 
 		return toLatLngBounds(
-			[this.lat - latAccuracy, this.lng - lngAccuracy],
-			[this.lat + latAccuracy, this.lng + lngAccuracy]);
+		        [this.lat - latAccuracy, this.lng - lngAccuracy],
+		        [this.lat + latAccuracy, this.lng + lngAccuracy]);
 	},
 
 	clone: function () {
 		return new LatLng(this.lat, this.lng, this.alt);
 	}
 };
+
 
 
 // @factory L.latLng(latitude: Number, longitude: Number, altitude?: Number): LatLng
@@ -1524,7 +1490,7 @@ var CRS = {
 	// Projects geographical coordinates into pixel coordinates for a given zoom.
 	latLngToPoint: function (latlng, zoom) {
 		var projectedPoint = this.projection.project(latlng),
-			scale = this.scale(zoom);
+		    scale = this.scale(zoom);
 
 		return this.transformation._transform(projectedPoint, scale);
 	},
@@ -1534,7 +1500,7 @@ var CRS = {
 	// zoom into geographical coordinates.
 	pointToLatLng: function (point, zoom) {
 		var scale = this.scale(zoom),
-			untransformedPoint = this.transformation.untransform(point, scale);
+		    untransformedPoint = this.transformation.untransform(point, scale);
 
 		return this.projection.unproject(untransformedPoint);
 	},
@@ -1571,14 +1537,12 @@ var CRS = {
 	// @method getProjectedBounds(zoom: Number): Bounds
 	// Returns the projection's bounds scaled and transformed for the provided `zoom`.
 	getProjectedBounds: function (zoom) {
-		if (this.infinite) {
-			return null;
-		}
+		if (this.infinite) { return null; }
 
 		var b = this.projection.bounds,
-			s = this.scale(zoom),
-			min = this.transformation.transform(b.min, s),
-			max = this.transformation.transform(b.max, s);
+		    s = this.scale(zoom),
+		    min = this.transformation.transform(b.min, s),
+		    max = this.transformation.transform(b.max, s);
 
 		return new Bounds(min, max);
 	},
@@ -1609,8 +1573,8 @@ var CRS = {
 	// CRS's `wrapLat` and `wrapLng` properties, if they are outside the CRS's bounds.
 	wrapLatLng: function (latlng) {
 		var lng = this.wrapLng ? wrapNum(latlng.lng, this.wrapLng, true) : latlng.lng,
-			lat = this.wrapLat ? wrapNum(latlng.lat, this.wrapLat, true) : latlng.lat,
-			alt = latlng.alt;
+		    lat = this.wrapLat ? wrapNum(latlng.lat, this.wrapLat, true) : latlng.lat,
+		    alt = latlng.alt;
 
 		return new LatLng(lat, lng, alt);
 	},
@@ -1621,18 +1585,18 @@ var CRS = {
 	// Only accepts actual `L.LatLngBounds` instances, not arrays.
 	wrapLatLngBounds: function (bounds) {
 		var center = bounds.getCenter(),
-			newCenter = this.wrapLatLng(center),
-			latShift = center.lat - newCenter.lat,
-			lngShift = center.lng - newCenter.lng;
+		    newCenter = this.wrapLatLng(center),
+		    latShift = center.lat - newCenter.lat,
+		    lngShift = center.lng - newCenter.lng;
 
 		if (latShift === 0 && lngShift === 0) {
 			return bounds;
 		}
 
 		var sw = bounds.getSouthWest(),
-			ne = bounds.getNorthEast(),
-			newSw = new LatLng(sw.lat - latShift, sw.lng - lngShift),
-			newNe = new LatLng(ne.lat - latShift, ne.lng - lngShift);
+		    ne = bounds.getNorthEast(),
+		    newSw = new LatLng(sw.lat - latShift, sw.lng - lngShift),
+		    newNe = new LatLng(ne.lat - latShift, ne.lng - lngShift);
 
 		return new LatLngBounds(newSw, newNe);
 	}
@@ -1659,12 +1623,12 @@ var Earth = extend({}, CRS, {
 	// distance between two geographical points using spherical law of cosines approximation
 	distance: function (latlng1, latlng2) {
 		var rad = Math.PI / 180,
-			lat1 = latlng1.lat * rad,
-			lat2 = latlng2.lat * rad,
-			sinDLat = Math.sin((latlng2.lat - latlng1.lat) * rad / 2),
-			sinDLon = Math.sin((latlng2.lng - latlng1.lng) * rad / 2),
-			a = sinDLat * sinDLat + Math.cos(lat1) * Math.cos(lat2) * sinDLon * sinDLon,
-			c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+		    lat1 = latlng1.lat * rad,
+		    lat2 = latlng2.lat * rad,
+		    sinDLat = Math.sin((latlng2.lat - latlng1.lat) * rad / 2),
+		    sinDLon = Math.sin((latlng2.lng - latlng1.lng) * rad / 2),
+		    a = sinDLat * sinDLat + Math.cos(lat1) * Math.cos(lat2) * sinDLon * sinDLon,
+		    c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 		return this.R * c;
 	}
 });
@@ -1687,9 +1651,9 @@ var SphericalMercator = {
 
 	project: function (latlng) {
 		var d = Math.PI / 180,
-			max = this.MAX_LATITUDE,
-			lat = Math.max(Math.min(max, latlng.lat), -max),
-			sin = Math.sin(lat * d);
+		    max = this.MAX_LATITUDE,
+		    lat = Math.max(Math.min(max, latlng.lat), -max),
+		    sin = Math.sin(lat * d);
 
 		return new Point(
 			this.R * latlng.lng * d,
@@ -1768,8 +1732,8 @@ Transformation.prototype = {
 	untransform: function (point, scale) {
 		scale = scale || 1;
 		return new Point(
-			(point.x / scale - this._b) / this._a,
-			(point.y / scale - this._d) / this._c);
+		        (point.x / scale - this._b) / this._a,
+		        (point.y / scale - this._d) / this._c);
 	}
 };
 
@@ -1826,7 +1790,7 @@ function svgCreate(name) {
 // into "M..L..L.." instructions
 function pointsToPath(rings, closed) {
 	var str = '',
-		i, j, len, len2, points, p;
+	i, j, len, len2, points, p;
 
 	for (i = 0, len = rings.length; i < len; i++) {
 		points = rings[i];
@@ -1944,7 +1908,7 @@ var pointer = !webkit && !!(window.PointerEvent || msPointer);
 // a touchscreen, it only means that the browser is capable of understanding
 // touch events.
 var touch = !window.L_NO_TOUCH && (pointer || 'ontouchstart' in window ||
-	(window.DocumentTouch && document instanceof window.DocumentTouch));
+		(window.DocumentTouch && document instanceof window.DocumentTouch));
 
 // @property mobileOpera: Boolean; `true` for the Opera browser in a mobile device.
 var mobileOpera = mobile && opera;
@@ -2047,9 +2011,9 @@ var Browser = (Object.freeze || Object)({
  */
 
 
-var POINTER_DOWN = msPointer ? 'MSPointerDown' : 'pointerdown';
-var POINTER_MOVE = msPointer ? 'MSPointerMove' : 'pointermove';
-var POINTER_UP = msPointer ? 'MSPointerUp' : 'pointerup';
+var POINTER_DOWN =   msPointer ? 'MSPointerDown'   : 'pointerdown';
+var POINTER_MOVE =   msPointer ? 'MSPointerMove'   : 'pointermove';
+var POINTER_UP =     msPointer ? 'MSPointerUp'     : 'pointerup';
 var POINTER_CANCEL = msPointer ? 'MSPointerCancel' : 'pointercancel';
 var TAG_WHITE_LIST = ['INPUT', 'SELECT', 'OPTION'];
 
@@ -2153,9 +2117,7 @@ function _handlePointer(e, handler) {
 function _addPointerMove(obj, handler, id) {
 	var onMove = function (e) {
 		// don't fire touch moves when mouse isn't down
-		if ((e.pointerType === e.MSPOINTER_TYPE_MOUSE || e.pointerType === 'mouse') && e.buttons === 0) {
-			return;
-		}
+		if ((e.pointerType === e.MSPOINTER_TYPE_MOUSE || e.pointerType === 'mouse') && e.buttons === 0) { return; }
 
 		_handlePointer(e, handler);
 	};
@@ -2185,27 +2147,23 @@ var _pre = '_leaflet_';
 // inspired by Zepto touch code by Thomas Fuchs
 function addDoubleTapListener(obj, handler, id) {
 	var last, touch$$1,
-		doubleTap = false,
-		delay = 250;
+	    doubleTap = false,
+	    delay = 250;
 
 	function onTouchStart(e) {
 		var count;
 
 		if (pointer) {
-			if ((!edge) || e.pointerType === 'mouse') {
-				return;
-			}
+			if ((!edge) || e.pointerType === 'mouse') { return; }
 			count = _pointersCount;
 		} else {
 			count = e.touches.length;
 		}
 
-		if (count > 1) {
-			return;
-		}
+		if (count > 1) { return; }
 
 		var now = Date.now(),
-			delta = now - (last || now);
+		    delta = now - (last || now);
 
 		touch$$1 = e.touches ? e.touches[0] : e;
 		doubleTap = (delta > 0 && delta <= delay);
@@ -2215,12 +2173,10 @@ function addDoubleTapListener(obj, handler, id) {
 	function onTouchEnd(e) {
 		if (doubleTap && !touch$$1.cancelBubble) {
 			if (pointer) {
-				if ((!edge) || e.pointerType === 'mouse') {
-					return;
-				}
+				if ((!edge) || e.pointerType === 'mouse') { return; }
 				// work around .type being readonly with MSPointer* events
 				var newTouch = {},
-					prop, i;
+				    prop, i;
 
 				for (i in touch$$1) {
 					prop = touch$$1[i];
@@ -2253,8 +2209,8 @@ function addDoubleTapListener(obj, handler, id) {
 
 function removeDoubleTapListener(obj, id) {
 	var touchstart = obj[_pre + _touchstart + id],
-		touchend = obj[_pre + _touchend + id],
-		dblclick = obj[_pre + 'dblclick' + id];
+	    touchend = obj[_pre + _touchend + id],
+	    dblclick = obj[_pre + 'dblclick' + id];
 
 	obj.removeEventListener(_touchstart, touchstart, passiveEvents ? {passive: false} : false);
 	obj.removeEventListener(_touchend, touchend, passiveEvents ? {passive: false} : false);
@@ -2432,7 +2388,7 @@ function setOpacity(el, value) {
 
 function _setOpacityIE(el, value) {
 	var filter = false,
-		filterName = 'DXImageTransform.Microsoft.Alpha';
+	    filterName = 'DXImageTransform.Microsoft.Alpha';
 
 	// filters collection throws an error if we try to retrieve a filter that doesn't exist
 	try {
@@ -2440,9 +2396,7 @@ function _setOpacityIE(el, value) {
 	} catch (e) {
 		// don't set opacity to 1 if we haven't already set an opacity,
 		// it isn't needed and breaks transparent pngs.
-		if (value === 1) {
-			return;
-		}
+		if (value === 1) { return; }
 	}
 
 	value = Math.round(value * 100);
@@ -2572,9 +2526,7 @@ function preventOutline(element) {
 	while (element.tabIndex === -1) {
 		element = element.parentNode;
 	}
-	if (!element.style) {
-		return;
-	}
+	if (!element.style) { return; }
 	restoreOutline();
 	_outlineElement = element;
 	_outlineStyle = element.style.outline;
@@ -2585,9 +2537,7 @@ function preventOutline(element) {
 // @function restoreOutline()
 // Cancels the effects of a previous [`L.DomUtil.preventOutline`]().
 function restoreOutline() {
-	if (!_outlineElement) {
-		return;
-	}
+	if (!_outlineElement) { return; }
 	_outlineElement.style.outline = _outlineStyle;
 	_outlineElement = undefined;
 	_outlineStyle = undefined;
@@ -2717,9 +2667,7 @@ function off(obj, types, fn, context) {
 function addOne(obj, type, fn, context) {
 	var id = type + stamp(fn) + (context ? '_' + stamp(context) : '');
 
-	if (obj[eventsKey] && obj[eventsKey][id]) {
-		return this;
-	}
+	if (obj[eventsKey] && obj[eventsKey][id]) { return this; }
 
 	var handler = function (e) {
 		return fn.call(context || obj, e || window.event);
@@ -2732,7 +2680,7 @@ function addOne(obj, type, fn, context) {
 		addPointerListener(obj, type, handler, id);
 
 	} else if (touch && (type === 'dblclick') && addDoubleTapListener &&
-		!(pointer && chrome)) {
+	           !(pointer && chrome)) {
 		// Chrome >55 does not need the synthetic dblclicks from addDoubleTapListener
 		// See #5180
 		addDoubleTapListener(obj, handler, id);
@@ -2771,17 +2719,15 @@ function addOne(obj, type, fn, context) {
 function removeOne(obj, type, fn, context) {
 
 	var id = type + stamp(fn) + (context ? '_' + stamp(context) : ''),
-		handler = obj[eventsKey] && obj[eventsKey][id];
+	    handler = obj[eventsKey] && obj[eventsKey][id];
 
-	if (!handler) {
-		return this;
-	}
+	if (!handler) { return this; }
 
 	if (pointer && type.indexOf('touch') === 0) {
 		removePointerListener(obj, type, id);
 
 	} else if (touch && (type === 'dblclick') && removeDoubleTapListener &&
-		!(pointer && chrome)) {
+	           !(pointer && chrome)) {
 		removeDoubleTapListener(obj, id);
 
 	} else if ('removeEventListener' in obj) {
@@ -2792,7 +2738,7 @@ function removeOne(obj, type, fn, context) {
 		} else {
 			obj.removeEventListener(
 				type === 'mouseenter' ? 'mouseover' :
-					type === 'mouseleave' ? 'mouseout' : type, handler, false);
+				type === 'mouseleave' ? 'mouseout' : type, handler, false);
 		}
 
 	} else if ('detachEvent' in obj) {
@@ -2870,7 +2816,7 @@ function getMousePosition(e, container) {
 	}
 
 	var scale = getScale(container),
-		offset = scale.boundingClientRect; // left and top  values are in page scale (like the event clientX/Y)
+	    offset = scale.boundingClientRect; // left and top  values are in page scale (like the event clientX/Y)
 
 	return new Point(
 		// offset.left/top values are in page scale (like clientX/Y),
@@ -2884,7 +2830,7 @@ function getMousePosition(e, container) {
 // and Firefox scrolls device pixels, not CSS pixels
 var wheelPxFactor =
 	(win && chrome) ? 2 * window.devicePixelRatio :
-		gecko ? window.devicePixelRatio : 1;
+	gecko ? window.devicePixelRatio : 1;
 
 // @function getWheelDelta(ev: DOMEvent): Number
 // Gets normalized wheel delta from a mousewheel DOM event, in vertical
@@ -2893,14 +2839,14 @@ var wheelPxFactor =
 // a best guess of 60 pixels.
 function getWheelDelta(e) {
 	return (edge) ? e.wheelDeltaY / 2 : // Don't trust window-geometry-based delta
-		(e.deltaY && e.deltaMode === 0) ? -e.deltaY / wheelPxFactor : // Pixels
-			(e.deltaY && e.deltaMode === 1) ? -e.deltaY * 20 : // Lines
-				(e.deltaY && e.deltaMode === 2) ? -e.deltaY * 60 : // Pages
-					(e.deltaX || e.deltaZ) ? 0 :	// Skip horizontal/depth wheel events
-						e.wheelDelta ? (e.wheelDeltaY || e.wheelDelta) / 2 : // Legacy IE pixels
-							(e.detail && Math.abs(e.detail) < 32765) ? -e.detail * 20 : // Legacy Moz lines
-								e.detail ? e.detail / -32765 * 60 : // Legacy Moz pages
-									0;
+	       (e.deltaY && e.deltaMode === 0) ? -e.deltaY / wheelPxFactor : // Pixels
+	       (e.deltaY && e.deltaMode === 1) ? -e.deltaY * 20 : // Lines
+	       (e.deltaY && e.deltaMode === 2) ? -e.deltaY * 60 : // Pages
+	       (e.deltaX || e.deltaZ) ? 0 :	// Skip horizontal/depth wheel events
+	       e.wheelDelta ? (e.wheelDeltaY || e.wheelDelta) / 2 : // Legacy IE pixels
+	       (e.detail && Math.abs(e.detail) < 32765) ? -e.detail * 20 : // Legacy Moz lines
+	       e.detail ? e.detail / -32765 * 60 : // Legacy Moz pages
+	       0;
 }
 
 var skipEvents = {};
@@ -2922,9 +2868,7 @@ function isExternalTarget(el, e) {
 
 	var related = e.relatedTarget;
 
-	if (!related) {
-		return true;
-	}
+	if (!related) { return true; }
 
 	try {
 		while (related && (related !== el)) {
@@ -2941,7 +2885,7 @@ var lastClick;
 // this is a horrible workaround for a bug in Android where a single touch triggers two click events
 function filterClick(e, handler) {
 	var timeStamp = (e.timeStamp || (e.originalEvent && e.originalEvent.timeStamp)),
-		elapsed = lastClick && (timeStamp - lastClick);
+	    elapsed = lastClick && (timeStamp - lastClick);
 
 	// are they closer together than 500ms yet more than 100ms?
 	// Android typically triggers them ~300ms apart while multiple listeners
@@ -2956,6 +2900,8 @@ function filterClick(e, handler) {
 
 	handler(e);
 }
+
+
 
 
 var DomEvent = (Object.freeze || Object)({
@@ -3021,9 +2967,7 @@ var PosAnimation = Evented.extend({
 	// @method stop()
 	// Stops the animation (if currently running).
 	stop: function () {
-		if (!this._inProgress) {
-			return;
-		}
+		if (!this._inProgress) { return; }
 
 		this._step(true);
 		this._complete();
@@ -3037,7 +2981,7 @@ var PosAnimation = Evented.extend({
 
 	_step: function (round) {
 		var elapsed = (+new Date()) - this._startTime,
-			duration = this._duration * 1000;
+		    duration = this._duration * 1000;
 
 		if (elapsed < duration) {
 			this._runFrame(this._easeOut(elapsed / duration), round);
@@ -3220,7 +3164,7 @@ var Map = Evented.extend({
 
 		// don't animate on browsers without hardware-accelerated transitions or old Android/Opera
 		this._zoomAnimated = TRANSITION && any3d && !mobileOpera &&
-			this.options.zoomAnimation;
+				this.options.zoomAnimation;
 
 		// zoom transitions run with the same duration for all layers, so if one of transitionend events
 		// happens after starting zoom animation (propagating to the map pane), we know that it ended globally
@@ -3303,11 +3247,11 @@ var Map = Evented.extend({
 	// Zooms the map while keeping a specified pixel on the map (relative to the top-left corner) stationary.
 	setZoomAround: function (latlng, zoom, options) {
 		var scale = this.getZoomScale(zoom),
-			viewHalf = this.getSize().divideBy(2),
-			containerPoint = latlng instanceof Point ? latlng : this.latLngToContainerPoint(latlng),
+		    viewHalf = this.getSize().divideBy(2),
+		    containerPoint = latlng instanceof Point ? latlng : this.latLngToContainerPoint(latlng),
 
-			centerOffset = containerPoint.subtract(viewHalf).multiplyBy(1 - 1 / scale),
-			newCenter = this.containerPointToLatLng(viewHalf.add(centerOffset));
+		    centerOffset = containerPoint.subtract(viewHalf).multiplyBy(1 - 1 / scale),
+		    newCenter = this.containerPointToLatLng(viewHalf.add(centerOffset));
 
 		return this.setView(newCenter, zoom, {zoom: options});
 	},
@@ -3318,9 +3262,9 @@ var Map = Evented.extend({
 		bounds = bounds.getBounds ? bounds.getBounds() : toLatLngBounds(bounds);
 
 		var paddingTL = toPoint(options.paddingTopLeft || options.padding || [0, 0]),
-			paddingBR = toPoint(options.paddingBottomRight || options.padding || [0, 0]),
+		    paddingBR = toPoint(options.paddingBottomRight || options.padding || [0, 0]),
 
-			zoom = this.getBoundsZoom(bounds, false, paddingTL.add(paddingBR));
+		    zoom = this.getBoundsZoom(bounds, false, paddingTL.add(paddingBR));
 
 		zoom = (typeof options.maxZoom === 'number') ? Math.min(options.maxZoom, zoom) : zoom;
 
@@ -3333,9 +3277,9 @@ var Map = Evented.extend({
 
 		var paddingOffset = paddingBR.subtract(paddingTL).divideBy(2),
 
-			swPoint = this.project(bounds.getSouthWest(), zoom),
-			nePoint = this.project(bounds.getNorthEast(), zoom),
-			center = this.unproject(swPoint.add(nePoint).divideBy(2).add(paddingOffset), zoom);
+		    swPoint = this.project(bounds.getSouthWest(), zoom),
+		    nePoint = this.project(bounds.getNorthEast(), zoom),
+		    center = this.unproject(swPoint.add(nePoint).divideBy(2).add(paddingOffset), zoom);
 
 		return {
 			center: center,
@@ -3428,67 +3372,52 @@ var Map = Evented.extend({
 		this._stop();
 
 		var from = this.project(this.getCenter()),
-			to = this.project(targetCenter),
-			size = this.getSize(),
-			startZoom = this._zoom;
+		    to = this.project(targetCenter),
+		    size = this.getSize(),
+		    startZoom = this._zoom;
 
 		targetCenter = toLatLng(targetCenter);
 		targetZoom = targetZoom === undefined ? startZoom : targetZoom;
 
 		var w0 = Math.max(size.x, size.y),
-			w1 = w0 * this.getZoomScale(startZoom, targetZoom),
-			u1 = (to.distanceTo(from)) || 1,
-			rho = 1.42,
-			rho2 = rho * rho;
+		    w1 = w0 * this.getZoomScale(startZoom, targetZoom),
+		    u1 = (to.distanceTo(from)) || 1,
+		    rho = 1.42,
+		    rho2 = rho * rho;
 
 		function r(i) {
 			var s1 = i ? -1 : 1,
-				s2 = i ? w1 : w0,
-				t1 = w1 * w1 - w0 * w0 + s1 * rho2 * rho2 * u1 * u1,
-				b1 = 2 * s2 * rho2 * u1,
-				b = t1 / b1,
-				sq = Math.sqrt(b * b + 1) - b;
+			    s2 = i ? w1 : w0,
+			    t1 = w1 * w1 - w0 * w0 + s1 * rho2 * rho2 * u1 * u1,
+			    b1 = 2 * s2 * rho2 * u1,
+			    b = t1 / b1,
+			    sq = Math.sqrt(b * b + 1) - b;
 
-			// workaround for floating point precision bug when sq = 0, log = -Infinite,
-			// thus triggering an infinite loop in flyTo
-			var log = sq < 0.000000001 ? -18 : Math.log(sq);
+			    // workaround for floating point precision bug when sq = 0, log = -Infinite,
+			    // thus triggering an infinite loop in flyTo
+			    var log = sq < 0.000000001 ? -18 : Math.log(sq);
 
 			return log;
 		}
 
-		function sinh(n) {
-			return (Math.exp(n) - Math.exp(-n)) / 2;
-		}
-
-		function cosh(n) {
-			return (Math.exp(n) + Math.exp(-n)) / 2;
-		}
-
-		function tanh(n) {
-			return sinh(n) / cosh(n);
-		}
+		function sinh(n) { return (Math.exp(n) - Math.exp(-n)) / 2; }
+		function cosh(n) { return (Math.exp(n) + Math.exp(-n)) / 2; }
+		function tanh(n) { return sinh(n) / cosh(n); }
 
 		var r0 = r(0);
 
-		function w(s) {
-			return w0 * (cosh(r0) / cosh(r0 + rho * s));
-		}
+		function w(s) { return w0 * (cosh(r0) / cosh(r0 + rho * s)); }
+		function u(s) { return w0 * (cosh(r0) * tanh(r0 + rho * s) - sinh(r0)) / rho2; }
 
-		function u(s) {
-			return w0 * (cosh(r0) * tanh(r0 + rho * s) - sinh(r0)) / rho2;
-		}
-
-		function easeOut(t) {
-			return 1 - Math.pow(1 - t, 1.5);
-		}
+		function easeOut(t) { return 1 - Math.pow(1 - t, 1.5); }
 
 		var start = Date.now(),
-			S = (r(1) - r0) / rho,
-			duration = options.duration ? 1000 * options.duration : 1000 * S * 0.8;
+		    S = (r(1) - r0) / rho,
+		    duration = options.duration ? 1000 * options.duration : 1000 * S * 0.8;
 
 		function frame() {
 			var t = (Date.now() - start) / duration,
-				s = easeOut(t) * S;
+			    s = easeOut(t) * S;
 
 			if (t <= 1) {
 				this._flyToFrame = requestAnimFrame(frame, this);
@@ -3579,7 +3508,7 @@ var Map = Evented.extend({
 	panInsideBounds: function (bounds, options) {
 		this._enforcingBounds = true;
 		var center = this.getCenter(),
-			newCenter = this._limitCenter(center, this._zoom, toLatLngBounds(bounds));
+		    newCenter = this._limitCenter(center, this._zoom, toLatLngBounds(bounds));
 
 		if (!center.equals(newCenter)) {
 			this.panTo(newCenter, options);
@@ -3599,18 +3528,18 @@ var Map = Evented.extend({
 		options = options || {};
 
 		var paddingTL = toPoint(options.paddingTopLeft || options.padding || [0, 0]),
-			paddingBR = toPoint(options.paddingBottomRight || options.padding || [0, 0]),
-			center = this.getCenter(),
-			pixelCenter = this.project(center),
-			pixelPoint = this.project(latlng),
-			pixelBounds = this.getPixelBounds(),
-			halfPixelBounds = pixelBounds.getSize().divideBy(2),
-			paddedBounds = toBounds([pixelBounds.min.add(paddingTL), pixelBounds.max.subtract(paddingBR)]);
+		    paddingBR = toPoint(options.paddingBottomRight || options.padding || [0, 0]),
+		    center = this.getCenter(),
+		    pixelCenter = this.project(center),
+		    pixelPoint = this.project(latlng),
+		    pixelBounds = this.getPixelBounds(),
+		    halfPixelBounds = pixelBounds.getSize().divideBy(2),
+		    paddedBounds = toBounds([pixelBounds.min.add(paddingTL), pixelBounds.max.subtract(paddingBR)]);
 
 		if (!paddedBounds.contains(pixelPoint)) {
 			this._enforcingBounds = true;
 			var diff = pixelCenter.subtract(pixelPoint),
-				newCenter = toPoint(pixelPoint.x + diff.x, pixelPoint.y + diff.y);
+			    newCenter = toPoint(pixelPoint.x + diff.x, pixelPoint.y + diff.y);
 
 			if (pixelPoint.x < paddedBounds.min.x || pixelPoint.x > paddedBounds.max.x) {
 				newCenter.x = pixelCenter.x - diff.x;
@@ -3648,9 +3577,7 @@ var Map = Evented.extend({
 	// call it after you've changed the map size dynamically, also animating
 	// pan by default.
 	invalidateSize: function (options) {
-		if (!this._loaded) {
-			return this;
-		}
+		if (!this._loaded) { return this; }
 
 		options = extend({
 			animate: false,
@@ -3662,13 +3589,11 @@ var Map = Evented.extend({
 		this._lastCenter = null;
 
 		var newSize = this.getSize(),
-			oldCenter = oldSize.divideBy(2).round(),
-			newCenter = newSize.divideBy(2).round(),
-			offset = oldCenter.subtract(newCenter);
+		    oldCenter = oldSize.divideBy(2).round(),
+		    newCenter = newSize.divideBy(2).round(),
+		    offset = oldCenter.subtract(newCenter);
 
-		if (!offset.x && !offset.y) {
-			return this;
-		}
+		if (!offset.x && !offset.y) { return this; }
 
 		if (options.animate && options.pan) {
 			this.panBy(offset);
@@ -3737,11 +3662,11 @@ var Map = Evented.extend({
 		}
 
 		var onResponse = bind(this._handleGeolocationResponse, this),
-			onError = bind(this._handleGeolocationError, this);
+		    onError = bind(this._handleGeolocationError, this);
 
 		if (options.watch) {
 			this._locationWatchId =
-				navigator.geolocation.watchPosition(onResponse, onError, options);
+			        navigator.geolocation.watchPosition(onResponse, onError, options);
 		} else {
 			navigator.geolocation.getCurrentPosition(onResponse, onError, options);
 		}
@@ -3764,9 +3689,9 @@ var Map = Evented.extend({
 
 	_handleGeolocationError: function (error) {
 		var c = error.code,
-			message = error.message ||
-				(c === 1 ? 'permission denied' :
-					(c === 2 ? 'position unavailable' : 'timeout'));
+		    message = error.message ||
+		            (c === 1 ? 'permission denied' :
+		            (c === 2 ? 'position unavailable' : 'timeout'));
 
 		if (this._locateOptions.setView && !this._loaded) {
 			this.fitWorld();
@@ -3783,10 +3708,10 @@ var Map = Evented.extend({
 
 	_handleGeolocationResponse: function (pos) {
 		var lat = pos.coords.latitude,
-			lng = pos.coords.longitude,
-			latlng = new LatLng(lat, lng),
-			bounds = latlng.toBounds(pos.coords.accuracy * 2),
-			options = this._locateOptions;
+		    lng = pos.coords.longitude,
+		    latlng = new LatLng(lat, lng),
+		    bounds = latlng.toBounds(pos.coords.accuracy * 2),
+		    options = this._locateOptions;
 
 		if (options.setView) {
 			var zoom = this.getBoundsZoom(bounds);
@@ -3816,9 +3741,7 @@ var Map = Evented.extend({
 	// @method addHandler(name: String, HandlerClass: Function): this
 	// Adds a new `Handler` to the map, given its name and constructor function.
 	addHandler: function (name, HandlerClass) {
-		if (!HandlerClass) {
-			return this;
-		}
+		if (!HandlerClass) { return this; }
 
 		var handler = this[name] = new HandlerClass(this);
 
@@ -3900,7 +3823,7 @@ var Map = Evented.extend({
 	// as a child of the main map pane if not set.
 	createPane: function (name, container) {
 		var className = 'leaflet-pane' + (name ? ' leaflet-' + name.replace('Pane', '') + '-pane' : ''),
-			pane = create$1('div', className, container || this._mapPane);
+		    pane = create$1('div', className, container || this._mapPane);
 
 		if (name) {
 			this._panes[name] = pane;
@@ -3931,8 +3854,8 @@ var Map = Evented.extend({
 	// Returns the geographical bounds visible in the current map view
 	getBounds: function () {
 		var bounds = this.getPixelBounds(),
-			sw = this.unproject(bounds.getBottomLeft()),
-			ne = this.unproject(bounds.getTopRight());
+		    sw = this.unproject(bounds.getBottomLeft()),
+		    ne = this.unproject(bounds.getTopRight());
 
 		return new LatLngBounds(sw, ne);
 	},
@@ -3961,16 +3884,16 @@ var Map = Evented.extend({
 		padding = toPoint(padding || [0, 0]);
 
 		var zoom = this.getZoom() || 0,
-			min = this.getMinZoom(),
-			max = this.getMaxZoom(),
-			nw = bounds.getNorthWest(),
-			se = bounds.getSouthEast(),
-			size = this.getSize().subtract(padding),
-			boundsSize = toBounds(this.project(se, zoom), this.project(nw, zoom)).getSize(),
-			snap = any3d ? this.options.zoomSnap : 1,
-			scalex = size.x / boundsSize.x,
-			scaley = size.y / boundsSize.y,
-			scale = inside ? Math.max(scalex, scaley) : Math.min(scalex, scaley);
+		    min = this.getMinZoom(),
+		    max = this.getMaxZoom(),
+		    nw = bounds.getNorthWest(),
+		    se = bounds.getSouthEast(),
+		    size = this.getSize().subtract(padding),
+		    boundsSize = toBounds(this.project(se, zoom), this.project(nw, zoom)).getSize(),
+		    snap = any3d ? this.options.zoomSnap : 1,
+		    scalex = size.x / boundsSize.x,
+		    scaley = size.y / boundsSize.y,
+		    scale = inside ? Math.max(scalex, scaley) : Math.min(scalex, scaley);
 
 		zoom = this.getScaleZoom(scale, zoom);
 
@@ -4422,13 +4345,11 @@ var Map = Evented.extend({
 	_onResize: function () {
 		cancelAnimFrame(this._resizeRequest);
 		this._resizeRequest = requestAnimFrame(
-			function () {
-				this.invalidateSize({debounceMoveend: true});
-			}, this);
+		        function () { this.invalidateSize({debounceMoveend: true}); }, this);
 	},
 
 	_onScroll: function () {
-		this._container.scrollTop = 0;
+		this._container.scrollTop  = 0;
 		this._container.scrollLeft = 0;
 	},
 
@@ -4443,10 +4364,10 @@ var Map = Evented.extend({
 
 	_findEventTargets: function (e, type) {
 		var targets = [],
-			target,
-			isHover = type === 'mouseout' || type === 'mouseover',
-			src = e.target || e.srcElement,
-			dragging = false;
+		    target,
+		    isHover = type === 'mouseout' || type === 'mouseover',
+		    src = e.target || e.srcElement,
+		    dragging = false;
 
 		while (src) {
 			target = this._targets[stamp(src)];
@@ -4456,17 +4377,11 @@ var Map = Evented.extend({
 				break;
 			}
 			if (target && target.listens(type, true)) {
-				if (isHover && !isExternalTarget(src, e)) {
-					break;
-				}
+				if (isHover && !isExternalTarget(src, e)) { break; }
 				targets.push(target);
-				if (isHover) {
-					break;
-				}
+				if (isHover) { break; }
 			}
-			if (src === this._container) {
-				break;
-			}
+			if (src === this._container) { break; }
 			src = src.parentNode;
 		}
 		if (!targets.length && !dragging && !isHover && isExternalTarget(src, e)) {
@@ -4476,9 +4391,7 @@ var Map = Evented.extend({
 	},
 
 	_handleDOMEvent: function (e) {
-		if (!this._loaded || skipped(e)) {
-			return;
-		}
+		if (!this._loaded || skipped(e)) { return; }
 
 		var type = e.type;
 
@@ -4505,16 +4418,12 @@ var Map = Evented.extend({
 			this._fireDOMEvent(synth, synth.type, targets);
 		}
 
-		if (e._stopped) {
-			return;
-		}
+		if (e._stopped) { return; }
 
 		// Find the layer the event is propagating from and its parents.
 		targets = (targets || []).concat(this._findEventTargets(e, type));
 
-		if (!targets.length) {
-			return;
-		}
+		if (!targets.length) { return; }
 
 		var target = targets[0];
 		if (type === 'contextmenu' && target.listens(type, true)) {
@@ -4536,9 +4445,7 @@ var Map = Evented.extend({
 		for (var i = 0; i < targets.length; i++) {
 			targets[i].fire(type, data, true);
 			if (data.originalEvent._stopped ||
-				(targets[i].options.bubblingMouseEvents === false && indexOf(this._mouseEvents, type) !== -1)) {
-				return;
-			}
+				(targets[i].options.bubblingMouseEvents === false && indexOf(this._mouseEvents, type) !== -1)) { return; }
 		}
 	},
 
@@ -4620,14 +4527,12 @@ var Map = Evented.extend({
 	// adjust center for view to get inside bounds
 	_limitCenter: function (center, zoom, bounds) {
 
-		if (!bounds) {
-			return center;
-		}
+		if (!bounds) { return center; }
 
 		var centerPoint = this.project(center, zoom),
-			viewHalf = this.getSize().divideBy(2),
-			viewBounds = new Bounds(centerPoint.subtract(viewHalf), centerPoint.add(viewHalf)),
-			offset = this._getBoundsOffset(viewBounds, bounds, zoom);
+		    viewHalf = this.getSize().divideBy(2),
+		    viewBounds = new Bounds(centerPoint.subtract(viewHalf), centerPoint.add(viewHalf)),
+		    offset = this._getBoundsOffset(viewBounds, bounds, zoom);
 
 		// If offset is less than a pixel, ignore.
 		// This prevents unstable projections from getting into
@@ -4641,12 +4546,10 @@ var Map = Evented.extend({
 
 	// adjust offset for view to get inside bounds
 	_limitOffset: function (offset, bounds) {
-		if (!bounds) {
-			return offset;
-		}
+		if (!bounds) { return offset; }
 
 		var viewBounds = this.getPixelBounds(),
-			newBounds = new Bounds(viewBounds.min.add(offset), viewBounds.max.add(offset));
+		    newBounds = new Bounds(viewBounds.min.add(offset), viewBounds.max.add(offset));
 
 		return offset.add(this._getBoundsOffset(newBounds, bounds));
 	},
@@ -4654,14 +4557,14 @@ var Map = Evented.extend({
 	// returns offset needed for pxBounds to get inside maxBounds at a specified zoom
 	_getBoundsOffset: function (pxBounds, maxBounds, zoom) {
 		var projectedMaxBounds = toBounds(
-			this.project(maxBounds.getNorthEast(), zoom),
-			this.project(maxBounds.getSouthWest(), zoom)
-			),
-			minOffset = projectedMaxBounds.min.subtract(pxBounds.min),
-			maxOffset = projectedMaxBounds.max.subtract(pxBounds.max),
+		        this.project(maxBounds.getNorthEast(), zoom),
+		        this.project(maxBounds.getSouthWest(), zoom)
+		    ),
+		    minOffset = projectedMaxBounds.min.subtract(pxBounds.min),
+		    maxOffset = projectedMaxBounds.max.subtract(pxBounds.max),
 
-			dx = this._rebound(minOffset.x, -maxOffset.x),
-			dy = this._rebound(minOffset.y, -maxOffset.y);
+		    dx = this._rebound(minOffset.x, -maxOffset.x),
+		    dy = this._rebound(minOffset.y, -maxOffset.y);
 
 		return new Point(dx, dy);
 	},
@@ -4674,8 +4577,8 @@ var Map = Evented.extend({
 
 	_limitZoom: function (zoom) {
 		var min = this.getMinZoom(),
-			max = this.getMaxZoom(),
-			snap = any3d ? this.options.zoomSnap : 1;
+		    max = this.getMaxZoom(),
+		    snap = any3d ? this.options.zoomSnap : 1;
 		if (snap) {
 			zoom = Math.round(zoom / snap) * snap;
 		}
@@ -4696,9 +4599,7 @@ var Map = Evented.extend({
 		var offset = this._getCenterOffset(center)._trunc();
 
 		// don't animate too far unless animate: true specified in options
-		if ((options && options.animate) !== true && !this.getSize().contains(offset)) {
-			return false;
-		}
+		if ((options && options.animate) !== true && !this.getSize().contains(offset)) { return false; }
 
 		this.panBy(offset, options);
 
@@ -4712,7 +4613,7 @@ var Map = Evented.extend({
 
 		this.on('zoomanim', function (e) {
 			var prop = TRANSFORM,
-				transform = this._proxy.style[prop];
+			    transform = this._proxy.style[prop];
 
 			setTransform(this._proxy, this.project(e.center, e.zoom), this.getZoomScale(e.zoom, 1));
 
@@ -4735,7 +4636,7 @@ var Map = Evented.extend({
 
 	_animMoveEnd: function () {
 		var c = this.getCenter(),
-			z = this.getZoom();
+		    z = this.getZoom();
 		setTransform(this._proxy, this.project(c, z), this.getZoomScale(z, 1));
 	},
 
@@ -4751,40 +4652,32 @@ var Map = Evented.extend({
 
 	_tryAnimatedZoom: function (center, zoom, options) {
 
-		if (this._animatingZoom) {
-			return true;
-		}
+		if (this._animatingZoom) { return true; }
 
 		options = options || {};
 
 		// don't animate if disabled, not supported or zoom difference is too large
 		if (!this._zoomAnimated || options.animate === false || this._nothingToAnimate() ||
-			Math.abs(zoom - this._zoom) > this.options.zoomAnimationThreshold) {
-			return false;
-		}
+		        Math.abs(zoom - this._zoom) > this.options.zoomAnimationThreshold) { return false; }
 
 		// offset is the pixel coords of the zoom origin relative to the current center
 		var scale = this.getZoomScale(zoom),
-			offset = this._getCenterOffset(center)._divideBy(1 - 1 / scale);
+		    offset = this._getCenterOffset(center)._divideBy(1 - 1 / scale);
 
 		// don't animate if the zoom origin isn't within one screen from the current center, unless forced
-		if (options.animate !== true && !this.getSize().contains(offset)) {
-			return false;
-		}
+		if (options.animate !== true && !this.getSize().contains(offset)) { return false; }
 
 		requestAnimFrame(function () {
 			this
-				._moveStart(true, false)
-				._animateZoom(center, zoom, true);
+			    ._moveStart(true, false)
+			    ._animateZoom(center, zoom, true);
 		}, this);
 
 		return true;
 	},
 
 	_animateZoom: function (center, zoom, startAnim, noUpdate) {
-		if (!this._mapPane) {
-			return;
-		}
+		if (!this._mapPane) { return; }
 
 		if (startAnim) {
 			this._animatingZoom = true;
@@ -4810,9 +4703,7 @@ var Map = Evented.extend({
 	},
 
 	_onZoomTransitionEnd: function () {
-		if (!this._animatingZoom) {
-			return;
-		}
+		if (!this._animatingZoom) { return; }
 
 		if (this._mapPane) {
 			removeClass(this._mapPane, 'leaflet-zoom-anim');
@@ -4907,8 +4798,8 @@ var Control = Class.extend({
 		this._map = map;
 
 		var container = this._container = this.onAdd(map),
-			pos = this.getPosition(),
-			corner = map._controlCorners[pos];
+		    pos = this.getPosition(),
+		    corner = map._controlCorners[pos];
 
 		addClass(container, 'leaflet-control');
 
@@ -4986,9 +4877,9 @@ Map.include({
 
 	_initControlPos: function () {
 		var corners = this._controlCorners = {},
-			l = 'leaflet-',
-			container = this._controlContainer =
-				create$1('div', l + 'control-container', this._container);
+		    l = 'leaflet-',
+		    container = this._controlContainer =
+		            create$1('div', l + 'control-container', this._container);
 
 		function createCorner(vSide, hSide) {
 			var className = l + vSide + ' ' + l + hSide;
@@ -5180,8 +5071,8 @@ var Layers = Control.extend({
 
 	_initLayout: function () {
 		var className = 'leaflet-control-layers',
-			container = this._container = create$1('div', className),
-			collapsed = this.options.collapsed;
+		    container = this._container = create$1('div', className),
+		    collapsed = this.options.collapsed;
 
 		// makes this work on IE touch devices by stopping it from firing a mouseout event when the touch is released
 		container.setAttribute('aria-haspopup', true);
@@ -5259,9 +5150,7 @@ var Layers = Control.extend({
 	},
 
 	_update: function () {
-		if (!this._container) {
-			return this;
-		}
+		if (!this._container) { return this; }
 
 		empty(this._baseLayersList);
 		empty(this._overlaysList);
@@ -5317,7 +5206,7 @@ var Layers = Control.extend({
 	_createRadioElement: function (name, checked) {
 
 		var radioHtml = '<input type="radio" class="leaflet-control-layers-selector" name="' +
-			name + '"' + (checked ? ' checked="checked"' : '') + '/>';
+				name + '"' + (checked ? ' checked="checked"' : '') + '/>';
 
 		var radioFragment = document.createElement('div');
 		radioFragment.innerHTML = radioHtml;
@@ -5327,8 +5216,8 @@ var Layers = Control.extend({
 
 	_addItem: function (obj) {
 		var label = document.createElement('label'),
-			checked = this._map.hasLayer(obj.layer),
-			input;
+		    checked = this._map.hasLayer(obj.layer),
+		    input;
 
 		if (obj.overlay) {
 			input = document.createElement('input');
@@ -5364,9 +5253,9 @@ var Layers = Control.extend({
 
 	_onInputClick: function () {
 		var inputs = this._layerControlInputs,
-			input, layer;
+		    input, layer;
 		var addedLayers = [],
-			removedLayers = [];
+		    removedLayers = [];
 
 		this._handlingClick = true;
 
@@ -5400,15 +5289,15 @@ var Layers = Control.extend({
 
 	_checkDisabledLayers: function () {
 		var inputs = this._layerControlInputs,
-			input,
-			layer,
-			zoom = this._map.getZoom();
+		    input,
+		    layer,
+		    zoom = this._map.getZoom();
 
 		for (var i = inputs.length - 1; i >= 0; i--) {
 			input = inputs[i];
 			layer = this._getLayer(input.layerId).layer;
 			input.disabled = (layer.options.minZoom !== undefined && zoom < layer.options.minZoom) ||
-				(layer.options.maxZoom !== undefined && zoom > layer.options.maxZoom);
+			                 (layer.options.maxZoom !== undefined && zoom > layer.options.maxZoom);
 
 		}
 	},
@@ -5472,13 +5361,13 @@ var Zoom = Control.extend({
 
 	onAdd: function (map) {
 		var zoomName = 'leaflet-control-zoom',
-			container = create$1('div', zoomName + ' leaflet-bar'),
-			options = this.options;
+		    container = create$1('div', zoomName + ' leaflet-bar'),
+		    options = this.options;
 
-		this._zoomInButton = this._createButton(options.zoomInText, options.zoomInTitle,
-			zoomName + '-in', container, this._zoomIn);
+		this._zoomInButton  = this._createButton(options.zoomInText, options.zoomInTitle,
+		        zoomName + '-in',  container, this._zoomIn);
 		this._zoomOutButton = this._createButton(options.zoomOutText, options.zoomOutTitle,
-			zoomName + '-out', container, this._zoomOut);
+		        zoomName + '-out', container, this._zoomOut);
 
 		this._updateDisabled();
 		map.on('zoomend zoomlevelschange', this._updateDisabled, this);
@@ -5536,7 +5425,7 @@ var Zoom = Control.extend({
 
 	_updateDisabled: function () {
 		var map = this._map,
-			className = 'leaflet-disabled';
+		    className = 'leaflet-disabled';
 
 		removeClass(this._zoomInButton, className);
 		removeClass(this._zoomOutButton, className);
@@ -5614,8 +5503,8 @@ var Scale = Control.extend({
 
 	onAdd: function (map) {
 		var className = 'leaflet-control-scale',
-			container = create$1('div', className),
-			options = this.options;
+		    container = create$1('div', className),
+		    options = this.options;
 
 		this._addScales(options, className + '-line', container);
 
@@ -5640,7 +5529,7 @@ var Scale = Control.extend({
 
 	_update: function () {
 		var map = this._map,
-			y = map.getSize().y / 2;
+		    y = map.getSize().y / 2;
 
 		var maxMeters = map.distance(
 			map.containerPointToLatLng([0, y]),
@@ -5660,14 +5549,14 @@ var Scale = Control.extend({
 
 	_updateMetric: function (maxMeters) {
 		var meters = this._getRoundNum(maxMeters),
-			label = meters < 1000 ? meters + ' m' : (meters / 1000) + ' km';
+		    label = meters < 1000 ? meters + ' m' : (meters / 1000) + ' km';
 
 		this._updateScale(this._mScale, label, meters / maxMeters);
 	},
 
 	_updateImperial: function (maxMeters) {
 		var maxFeet = maxMeters * 3.2808399,
-			maxMiles, miles, feet;
+		    maxMiles, miles, feet;
 
 		if (maxFeet > 5280) {
 			maxMiles = maxFeet / 5280;
@@ -5687,12 +5576,12 @@ var Scale = Control.extend({
 
 	_getRoundNum: function (num) {
 		var pow10 = Math.pow(10, (Math.floor(num) + '').length - 1),
-			d = num / pow10;
+		    d = num / pow10;
 
 		d = d >= 10 ? 10 :
-			d >= 5 ? 5 :
-				d >= 3 ? 3 :
-					d >= 2 ? 2 : 1;
+		    d >= 5 ? 5 :
+		    d >= 3 ? 3 :
+		    d >= 2 ? 2 : 1;
 
 		return pow10 * d;
 	}
@@ -5758,9 +5647,7 @@ var Attribution = Control.extend({
 	// @method addAttribution(text: String): this
 	// Adds an attribution text (e.g. `'Vector data &copy; Mapbox'`).
 	addAttribution: function (text) {
-		if (!text) {
-			return this;
-		}
+		if (!text) { return this; }
 
 		if (!this._attributions[text]) {
 			this._attributions[text] = 0;
@@ -5775,9 +5662,7 @@ var Attribution = Control.extend({
 	// @method removeAttribution(text: String): this
 	// Removes an attribution text.
 	removeAttribution: function (text) {
-		if (!text) {
-			return this;
-		}
+		if (!text) { return this; }
 
 		if (this._attributions[text]) {
 			this._attributions[text]--;
@@ -5788,9 +5673,7 @@ var Attribution = Control.extend({
 	},
 
 	_update: function () {
-		if (!this._map) {
-			return;
-		}
+		if (!this._map) { return; }
 
 		var attribs = [];
 
@@ -5861,9 +5744,7 @@ var Handler = Class.extend({
 	// @method enable(): this
 	// Enables the handler
 	enable: function () {
-		if (this._enabled) {
-			return this;
-		}
+		if (this._enabled) { return this; }
 
 		this._enabled = true;
 		this.addHooks();
@@ -5873,9 +5754,7 @@ var Handler = Class.extend({
 	// @method disable(): this
 	// Disables the handler
 	disable: function () {
-		if (!this._enabled) {
-			return this;
-		}
+		if (!this._enabled) { return this; }
 
 		this._enabled = false;
 		this.removeHooks();
@@ -5961,9 +5840,7 @@ var Draggable = Evented.extend({
 	// @method enable()
 	// Enables the dragging ability
 	enable: function () {
-		if (this._enabled) {
-			return;
-		}
+		if (this._enabled) { return; }
 
 		on(this._dragStartTarget, START, this._onDown, this);
 
@@ -5973,9 +5850,7 @@ var Draggable = Evented.extend({
 	// @method disable()
 	// Disables the dragging ability
 	disable: function () {
-		if (!this._enabled) {
-			return;
-		}
+		if (!this._enabled) { return; }
 
 		// If we're currently dragging this draggable,
 		// disabling it counts as first ending the drag.
@@ -5995,19 +5870,13 @@ var Draggable = Evented.extend({
 		// touch events, see #4315.
 		// Also ignore the event if disabled; this happens in IE11
 		// under some circumstances, see #3666.
-		if (e._simulated || !this._enabled) {
-			return;
-		}
+		if (e._simulated || !this._enabled) { return; }
 
 		this._moved = false;
 
-		if (hasClass(this._element, 'leaflet-zoom-anim')) {
-			return;
-		}
+		if (hasClass(this._element, 'leaflet-zoom-anim')) { return; }
 
-		if (Draggable._dragging || e.shiftKey || ((e.which !== 1) && (e.button !== 1) && !e.touches)) {
-			return;
-		}
+		if (Draggable._dragging || e.shiftKey || ((e.which !== 1) && (e.button !== 1) && !e.touches)) { return; }
 		Draggable._dragging = this;  // Prevent dragging multiple objects at once.
 
 		if (this._preventOutline) {
@@ -6017,16 +5886,14 @@ var Draggable = Evented.extend({
 		disableImageDrag();
 		disableTextSelection();
 
-		if (this._moving) {
-			return;
-		}
+		if (this._moving) { return; }
 
 		// @event down: Event
 		// Fired when a drag is about to start.
 		this.fire('down');
 
 		var first = e.touches ? e.touches[0] : e,
-			sizedParent = getSizedParentNode(this._element);
+		    sizedParent = getSizedParentNode(this._element);
 
 		this._startPoint = new Point(first.clientX, first.clientY);
 
@@ -6043,9 +5910,7 @@ var Draggable = Evented.extend({
 		// touch events, see #4315.
 		// Also ignore the event if disabled; this happens in IE11
 		// under some circumstances, see #3666.
-		if (e._simulated || !this._enabled) {
-			return;
-		}
+		if (e._simulated || !this._enabled) { return; }
 
 		if (e.touches && e.touches.length > 1) {
 			this._moved = true;
@@ -6053,14 +5918,10 @@ var Draggable = Evented.extend({
 		}
 
 		var first = (e.touches && e.touches.length === 1 ? e.touches[0] : e),
-			offset = new Point(first.clientX, first.clientY)._subtract(this._startPoint);
+		    offset = new Point(first.clientX, first.clientY)._subtract(this._startPoint);
 
-		if (!offset.x && !offset.y) {
-			return;
-		}
-		if (Math.abs(offset.x) + Math.abs(offset.y) < this.options.clickTolerance) {
-			return;
-		}
+		if (!offset.x && !offset.y) { return; }
+		if (Math.abs(offset.x) + Math.abs(offset.y) < this.options.clickTolerance) { return; }
 
 		// We assume that the parent container's position, border and scale do not change for the duration of the drag.
 		// Therefore there is no need to account for the position and border (they are eliminated by the subtraction)
@@ -6117,9 +5978,7 @@ var Draggable = Evented.extend({
 		// touch events, see #4315.
 		// Also ignore the event if disabled; this happens in IE11
 		// under some circumstances, see #3666.
-		if (e._simulated || !this._enabled) {
-			return;
-		}
+		if (e._simulated || !this._enabled) { return; }
 		this.finishDrag();
 	},
 
@@ -6180,11 +6039,11 @@ function simplify(points, tolerance) {
 
 	var sqTolerance = tolerance * tolerance;
 
-	// stage 1: vertex reduction
-	points = _reducePoints(points, sqTolerance);
+	    // stage 1: vertex reduction
+	    points = _reducePoints(points, sqTolerance);
 
-	// stage 2: Douglas-Peucker simplification
-	points = _simplifyDP(points, sqTolerance);
+	    // stage 2: Douglas-Peucker simplification
+	    points = _simplifyDP(points, sqTolerance);
 
 	return points;
 }
@@ -6205,15 +6064,15 @@ function closestPointOnSegment(p, p1, p2) {
 function _simplifyDP(points, sqTolerance) {
 
 	var len = points.length,
-		ArrayConstructor = typeof Uint8Array !== undefined + '' ? Uint8Array : Array,
-		markers = new ArrayConstructor(len);
+	    ArrayConstructor = typeof Uint8Array !== undefined + '' ? Uint8Array : Array,
+	    markers = new ArrayConstructor(len);
 
-	markers[0] = markers[len - 1] = 1;
+	    markers[0] = markers[len - 1] = 1;
 
 	_simplifyDPStep(points, markers, sqTolerance, 0, len - 1);
 
 	var i,
-		newPoints = [];
+	    newPoints = [];
 
 	for (i = 0; i < len; i++) {
 		if (markers[i]) {
@@ -6227,7 +6086,7 @@ function _simplifyDP(points, sqTolerance) {
 function _simplifyDPStep(points, markers, sqTolerance, first, last) {
 
 	var maxSqDist = 0,
-		index, i, sqDist;
+	index, i, sqDist;
 
 	for (i = first + 1; i <= last - 1; i++) {
 		sqDist = _sqClosestPointOnSegment(points[i], points[first], points[last], true);
@@ -6271,12 +6130,12 @@ var _lastCode;
 // points that are on the screen or near, increasing performance.
 function clipSegment(a, b, bounds, useLastCode, round) {
 	var codeA = useLastCode ? _lastCode : _getBitCode(a, bounds),
-		codeB = _getBitCode(b, bounds),
+	    codeB = _getBitCode(b, bounds),
 
-		codeOut, p, newCode;
+	    codeOut, p, newCode;
 
-	// save 2nd code to avoid calculating it on the next segment
-	_lastCode = codeB;
+	    // save 2nd code to avoid calculating it on the next segment
+	    _lastCode = codeB;
 
 	while (true) {
 		// if a,b is inside the clip window (trivial accept)
@@ -6306,10 +6165,10 @@ function clipSegment(a, b, bounds, useLastCode, round) {
 
 function _getEdgeIntersection(a, b, code, bounds, round) {
 	var dx = b.x - a.x,
-		dy = b.y - a.y,
-		min = bounds.min,
-		max = bounds.max,
-		x, y;
+	    dy = b.y - a.y,
+	    min = bounds.min,
+	    max = bounds.max,
+	    x, y;
 
 	if (code & 8) { // top
 		x = a.x + dx * (max.y - a.y) / dy;
@@ -6352,18 +6211,18 @@ function _getBitCode(p, bounds) {
 // square distance (to avoid unnecessary Math.sqrt calls)
 function _sqDist(p1, p2) {
 	var dx = p2.x - p1.x,
-		dy = p2.y - p1.y;
+	    dy = p2.y - p1.y;
 	return dx * dx + dy * dy;
 }
 
 // return closest point on segment or distance to that point
 function _sqClosestPointOnSegment(p, p1, p2, sqDist) {
 	var x = p1.x,
-		y = p1.y,
-		dx = p2.x - x,
-		dy = p2.y - y,
-		dot = dx * dx + dy * dy,
-		t;
+	    y = p1.y,
+	    dx = p2.x - x,
+	    dy = p2.y - y,
+	    dot = dx * dx + dy * dy,
+	    t;
 
 	if (dot > 0) {
 		t = ((p.x - x) * dx + (p.y - y) * dy) / dot;
@@ -6421,10 +6280,10 @@ var LineUtil = (Object.freeze || Object)({
  */
 function clipPolygon(points, bounds, round) {
 	var clippedPoints,
-		edges = [1, 4, 2, 8],
-		i, j, k,
-		a, b,
-		len, edge, p;
+	    edges = [1, 4, 2, 8],
+	    i, j, k,
+	    a, b,
+	    len, edge, p;
 
 	for (i = 0, len = points.length; i < len; i++) {
 		points[i]._code = _getBitCode(points[i], bounds);
@@ -6449,7 +6308,7 @@ function clipPolygon(points, bounds, round) {
 				}
 				clippedPoints.push(a);
 
-				// else if b is inside the clip window (a->b enters the screen)
+			// else if b is inside the clip window (a->b enters the screen)
 			} else if (!(b._code & edge)) {
 				p = _getEdgeIntersection(b, a, edge, bounds, round);
 				p._code = _getBitCode(p, bounds);
@@ -6507,11 +6366,11 @@ var Mercator = {
 
 	project: function (latlng) {
 		var d = Math.PI / 180,
-			r = this.R,
-			y = latlng.lat * d,
-			tmp = this.R_MINOR / r,
-			e = Math.sqrt(1 - tmp * tmp),
-			con = e * Math.sin(y);
+		    r = this.R,
+		    y = latlng.lat * d,
+		    tmp = this.R_MINOR / r,
+		    e = Math.sqrt(1 - tmp * tmp),
+		    con = e * Math.sin(y);
 
 		var ts = Math.tan(Math.PI / 4 - y / 2) / Math.pow((1 - con) / (1 + con), e / 2);
 		y = -r * Math.log(Math.max(ts, 1E-10));
@@ -6521,11 +6380,11 @@ var Mercator = {
 
 	unproject: function (point) {
 		var d = 180 / Math.PI,
-			r = this.R,
-			tmp = this.R_MINOR / r,
-			e = Math.sqrt(1 - tmp * tmp),
-			ts = Math.exp(-point.y / r),
-			phi = Math.PI / 2 - 2 * Math.atan(ts);
+		    r = this.R,
+		    tmp = this.R_MINOR / r,
+		    e = Math.sqrt(1 - tmp * tmp),
+		    ts = Math.exp(-point.y / r),
+		    phi = Math.PI / 2 - 2 * Math.atan(ts);
 
 		for (var i = 0, dphi = 0.1, con; i < 15 && Math.abs(dphi) > 1e-7; i++) {
 			con = e * Math.sin(phi);
@@ -6560,6 +6419,8 @@ var Mercator = {
  * and methods can't be added to them with the `include` function.
 
  */
+
+
 
 
 var index = (Object.freeze || Object)({
@@ -6627,7 +6488,7 @@ var Simple = extend({}, CRS, {
 
 	distance: function (latlng1, latlng2) {
 		var dx = latlng2.lng - latlng1.lng,
-			dy = latlng2.lat - latlng1.lat;
+		    dy = latlng2.lat - latlng1.lat;
 
 		return Math.sqrt(dx * dx + dy * dy);
 	},
@@ -6734,9 +6595,7 @@ var Layer = Evented.extend({
 		var map = e.target;
 
 		// check in case layer gets added and then removed before the map is ready
-		if (!map.hasLayer(this)) {
-			return;
-		}
+		if (!map.hasLayer(this)) { return; }
 
 		this._map = map;
 		this._zoomAnimated = map._zoomAnimated;
@@ -6802,9 +6661,7 @@ Map.include({
 		}
 
 		var id = stamp(layer);
-		if (this._layers[id]) {
-			return this;
-		}
+		if (this._layers[id]) { return this; }
 		this._layers[id] = layer;
 
 		layer._mapToAdd = this;
@@ -6823,9 +6680,7 @@ Map.include({
 	removeLayer: function (layer) {
 		var id = stamp(layer);
 
-		if (!this._layers[id]) {
-			return this;
-		}
+		if (!this._layers[id]) { return this; }
 
 		if (this._loaded) {
 			layer.onRemove(this);
@@ -6894,8 +6749,8 @@ Map.include({
 
 	_updateZoomLevels: function () {
 		var minZoom = Infinity,
-			maxZoom = -Infinity,
-			oldZoomSpan = this._getZoomSpan();
+		    maxZoom = -Infinity,
+		    oldZoomSpan = this._getZoomSpan();
 
 		for (var i in this._zoomBoundLayers) {
 			var options = this._zoomBoundLayers[i].options;
@@ -7010,7 +6865,7 @@ var LayerGroup = Layer.extend({
 	// implement `methodName`.
 	invoke: function (methodName) {
 		var args = Array.prototype.slice.call(arguments, 1),
-			i, layer;
+		    i, layer;
 
 		for (i in this._layers) {
 			layer = this._layers[i];
@@ -7288,18 +7143,18 @@ var Icon = Class.extend({
 		}
 
 		var size = toPoint(sizeOption),
-			anchor = toPoint(name === 'shadow' && options.shadowAnchor || options.iconAnchor ||
-				size && size.divideBy(2, true));
+		    anchor = toPoint(name === 'shadow' && options.shadowAnchor || options.iconAnchor ||
+		            size && size.divideBy(2, true));
 
 		img.className = 'leaflet-marker-' + name + ' ' + (options.className || '');
 
 		if (anchor) {
 			img.style.marginLeft = (-anchor.x) + 'px';
-			img.style.marginTop = (-anchor.y) + 'px';
+			img.style.marginTop  = (-anchor.y) + 'px';
 		}
 
 		if (size) {
-			img.style.width = size.x + 'px';
+			img.style.width  = size.x + 'px';
 			img.style.height = size.y + 'px';
 		}
 	},
@@ -7341,14 +7196,14 @@ function icon(options) {
 var IconDefault = Icon.extend({
 
 	options: {
-		iconUrl: 'marker-icon.png',
+		iconUrl:       'marker-icon.png',
 		iconRetinaUrl: 'marker-icon-2x.png',
-		shadowUrl: 'marker-shadow.png',
-		iconSize: [25, 41],
-		iconAnchor: [12, 41],
+		shadowUrl:     'marker-shadow.png',
+		iconSize:    [25, 41],
+		iconAnchor:  [12, 41],
 		popupAnchor: [1, -34],
 		tooltipAnchor: [16, -28],
-		shadowSize: [41, 41]
+		shadowSize:  [41, 41]
 	},
 
 	_getIconUrl: function (name) {
@@ -7364,9 +7219,9 @@ var IconDefault = Icon.extend({
 	},
 
 	_detectIconPath: function () {
-		var el = create$1('div', 'leaflet-default-icon-path', document.body);
+		var el = create$1('div',  'leaflet-default-icon-path', document.body);
 		var path = getStyle(el, 'background-image') ||
-			getStyle(el, 'backgroundImage');	// IE8
+		           getStyle(el, 'backgroundImage');	// IE8
 
 		document.body.removeChild(el);
 
@@ -7439,12 +7294,12 @@ var MarkerDrag = Handler.extend({
 
 	_adjustPan: function (e) {
 		var marker = this._marker,
-			map = marker._map,
-			speed = this._marker.options.autoPanSpeed,
-			padding = this._marker.options.autoPanPadding,
-			iconPos = getPosition(marker._icon),
-			bounds = map.getPixelBounds(),
-			origin = map.getPixelOrigin();
+		    map = marker._map,
+		    speed = this._marker.options.autoPanSpeed,
+		    padding = this._marker.options.autoPanPadding,
+		    iconPos = getPosition(marker._icon),
+		    bounds = map.getPixelBounds(),
+		    origin = map.getPixelOrigin();
 
 		var panBounds = toBounds(
 			bounds.min._subtract(origin).add(padding),
@@ -7483,9 +7338,9 @@ var MarkerDrag = Handler.extend({
 
 		this._oldLatLng = this._marker.getLatLng();
 		this._marker
-			.closePopup()
-			.fire('movestart')
-			.fire('dragstart');
+		    .closePopup()
+		    .fire('movestart')
+		    .fire('dragstart');
 	},
 
 	_onPreDrag: function (e) {
@@ -7497,9 +7352,9 @@ var MarkerDrag = Handler.extend({
 
 	_onDrag: function (e) {
 		var marker = this._marker,
-			shadow = marker._shadow,
-			iconPos = getPosition(marker._icon),
-			latlng = marker._map.layerPointToLatLng(iconPos);
+		    shadow = marker._shadow,
+		    iconPos = getPosition(marker._icon),
+		    latlng = marker._map.layerPointToLatLng(iconPos);
 
 		// update shadow position
 		if (shadow) {
@@ -7513,22 +7368,22 @@ var MarkerDrag = Handler.extend({
 		// @event drag: Event
 		// Fired repeatedly while the user drags the marker.
 		marker
-			.fire('move', e)
-			.fire('drag', e);
+		    .fire('move', e)
+		    .fire('drag', e);
 	},
 
 	_onDragEnd: function (e) {
 		// @event dragend: DragEndEvent
 		// Fired when the user stops dragging the marker.
 
-		cancelAnimFrame(this._panRequest);
+		 cancelAnimFrame(this._panRequest);
 
 		// @event moveend: Event
 		// Fired when the marker stops moving (because of dragging).
 		delete this._oldLatLng;
 		this._marker
-			.fire('moveend')
-			.fire('dragend', e);
+		    .fire('moveend')
+		    .fire('dragend', e);
 	}
 });
 
@@ -7727,10 +7582,10 @@ var Marker = Layer.extend({
 
 	_initIcon: function () {
 		var options = this.options,
-			classToAdd = 'leaflet-zoom-' + (this._zoomAnimated ? 'animated' : 'hide');
+		    classToAdd = 'leaflet-zoom-' + (this._zoomAnimated ? 'animated' : 'hide');
 
 		var icon = options.icon.createIcon(this._icon),
-			addIcon = false;
+		    addIcon = false;
 
 		// if we're not reusing the icon, remove the old one and init new one
 		if (icon !== this._icon) {
@@ -7764,7 +7619,7 @@ var Marker = Layer.extend({
 		}
 
 		var newShadow = options.icon.createShadow(this._shadow),
-			addShadow = false;
+		    addShadow = false;
 
 		if (newShadow !== this._shadow) {
 			this._removeShadow();
@@ -7842,9 +7697,7 @@ var Marker = Layer.extend({
 
 	_initInteraction: function () {
 
-		if (!this.options.interactive) {
-			return;
-		}
+		if (!this.options.interactive) { return; }
 
 		addClass(this._icon, 'leaflet-interactive');
 
@@ -8116,7 +7969,7 @@ var CircleMarker = Path.extend({
 		return this._radius;
 	},
 
-	setStyle: function (options) {
+	setStyle : function (options) {
 		var radius = options && options.radius || this._radius;
 		Path.prototype.setStyle.call(this, options);
 		this.setRadius(radius);
@@ -8130,9 +7983,9 @@ var CircleMarker = Path.extend({
 
 	_updateBounds: function () {
 		var r = this._radius,
-			r2 = this._radiusY || r,
-			w = this._clickTolerance(),
-			p = [r + w, r2 + w];
+		    r2 = this._radiusY || r,
+		    w = this._clickTolerance(),
+		    p = [r + w, r2 + w];
 		this._pxBounds = new Bounds(this._point.subtract(p), this._point.add(p));
 	},
 
@@ -8189,9 +8042,7 @@ var Circle = CircleMarker.extend({
 		setOptions(this, options);
 		this._latlng = toLatLng(latlng);
 
-		if (isNaN(this.options.radius)) {
-			throw new Error('Circle radius cannot be NaN');
-		}
+		if (isNaN(this.options.radius)) { throw new Error('Circle radius cannot be NaN'); }
 
 		// @section
 		// @aka Circle options
@@ -8227,19 +8078,19 @@ var Circle = CircleMarker.extend({
 	_project: function () {
 
 		var lng = this._latlng.lng,
-			lat = this._latlng.lat,
-			map = this._map,
-			crs = map.options.crs;
+		    lat = this._latlng.lat,
+		    map = this._map,
+		    crs = map.options.crs;
 
 		if (crs.distance === Earth.distance) {
 			var d = Math.PI / 180,
-				latR = (this._mRadius / Earth.R) / d,
-				top = map.project([lat + latR, lng]),
-				bottom = map.project([lat - latR, lng]),
-				p = top.add(bottom).divideBy(2),
-				lat2 = map.unproject(p).lat,
-				lngR = Math.acos((Math.cos(latR * d) - Math.sin(lat * d) * Math.sin(lat2 * d)) /
-					(Math.cos(lat * d) * Math.cos(lat2 * d))) / d;
+			    latR = (this._mRadius / Earth.R) / d,
+			    top = map.project([lat + latR, lng]),
+			    bottom = map.project([lat - latR, lng]),
+			    p = top.add(bottom).divideBy(2),
+			    lat2 = map.unproject(p).lat,
+			    lngR = Math.acos((Math.cos(latR * d) - Math.sin(lat * d) * Math.sin(lat2 * d)) /
+			            (Math.cos(lat * d) * Math.cos(lat2 * d))) / d;
 
 			if (isNaN(lngR) || lngR === 0) {
 				lngR = latR / Math.cos(Math.PI / 180 * lat); // Fallback for edge case, #2425
@@ -8353,9 +8204,9 @@ var Polyline = Path.extend({
 	// Returns the point closest to `p` on the Polyline.
 	closestLayerPoint: function (p) {
 		var minDistance = Infinity,
-			minPoint = null,
-			closest = _sqClosestPointOnSegment,
-			p1, p2;
+		    minPoint = null,
+		    closest = _sqClosestPointOnSegment,
+		    p1, p2;
 
 		for (var j = 0, jLen = this._parts.length; j < jLen; j++) {
 			var points = this._parts[j];
@@ -8387,12 +8238,10 @@ var Polyline = Path.extend({
 		}
 
 		var i, halfDist, segDist, dist, p1, p2, ratio,
-			points = this._rings[0],
-			len = points.length;
+		    points = this._rings[0],
+		    len = points.length;
 
-		if (!len) {
-			return null;
-		}
+		if (!len) { return null; }
 
 		// polyline centroid algorithm; only uses the first ring if there are multiple
 
@@ -8451,7 +8300,7 @@ var Polyline = Path.extend({
 	// recursively convert latlngs input into actual LatLng instances; calculate bounds along the way
 	_convertLatLngs: function (latlngs) {
 		var result = [],
-			flat = isFlat(latlngs);
+		    flat = isFlat(latlngs);
 
 		for (var i = 0, len = latlngs.length; i < len; i++) {
 			if (flat) {
@@ -8478,7 +8327,7 @@ var Polyline = Path.extend({
 
 	_updateBounds: function () {
 		var w = this._clickTolerance(),
-			p = new Point(w, w);
+		    p = new Point(w, w);
 		this._pxBounds = new Bounds([
 			this._rawPxBounds.min.subtract(p),
 			this._rawPxBounds.max.add(p)
@@ -8488,8 +8337,8 @@ var Polyline = Path.extend({
 	// recursively turns latlngs into a set of rings with projected coordinates
 	_projectLatlngs: function (latlngs, result, projectedBounds) {
 		var flat = latlngs[0] instanceof LatLng,
-			len = latlngs.length,
-			i, ring;
+		    len = latlngs.length,
+		    i, ring;
 
 		if (flat) {
 			ring = [];
@@ -8520,7 +8369,7 @@ var Polyline = Path.extend({
 		}
 
 		var parts = this._parts,
-			i, j, k, len, len2, segment, points;
+		    i, j, k, len, len2, segment, points;
 
 		for (i = 0, k = 0, len = this._rings.length; i < len; i++) {
 			points = this._rings[i];
@@ -8528,9 +8377,7 @@ var Polyline = Path.extend({
 			for (j = 0, len2 = points.length; j < len2 - 1; j++) {
 				segment = clipSegment(points[j], points[j + 1], bounds, j, true);
 
-				if (!segment) {
-					continue;
-				}
+				if (!segment) { continue; }
 
 				parts[k] = parts[k] || [];
 				parts[k].push(segment[0]);
@@ -8547,7 +8394,7 @@ var Polyline = Path.extend({
 	// simplify each clipped part of the polyline for performance
 	_simplifyPoints: function () {
 		var parts = this._parts,
-			tolerance = this.options.smoothFactor;
+		    tolerance = this.options.smoothFactor;
 
 		for (var i = 0, len = parts.length; i < len; i++) {
 			parts[i] = simplify(parts[i], tolerance);
@@ -8555,9 +8402,7 @@ var Polyline = Path.extend({
 	},
 
 	_update: function () {
-		if (!this._map) {
-			return;
-		}
+		if (!this._map) { return; }
 
 		this._clipPoints();
 		this._simplifyPoints();
@@ -8571,20 +8416,16 @@ var Polyline = Path.extend({
 	// Needed by the `Canvas` renderer for interactivity
 	_containsPoint: function (p, closed) {
 		var i, j, k, len, len2, part,
-			w = this._clickTolerance();
+		    w = this._clickTolerance();
 
-		if (!this._pxBounds || !this._pxBounds.contains(p)) {
-			return false;
-		}
+		if (!this._pxBounds || !this._pxBounds.contains(p)) { return false; }
 
 		// hit detection for polylines
 		for (i = 0, len = this._parts.length; i < len; i++) {
 			part = this._parts[i];
 
 			for (j = 0, len2 = part.length, k = len2 - 1; j < len2; k = j++) {
-				if (!closed && (j === 0)) {
-					continue;
-				}
+				if (!closed && (j === 0)) { continue; }
 
 				if (pointToSegmentDistance(p, part[k], part[j]) <= w) {
 					return true;
@@ -8670,12 +8511,10 @@ var Polygon = Polyline.extend({
 		}
 
 		var i, j, p1, p2, f, area, x, y, center,
-			points = this._rings[0],
-			len = points.length;
+		    points = this._rings[0],
+		    len = points.length;
 
-		if (!len) {
-			return null;
-		}
+		if (!len) { return null; }
 
 		// polygon centroid algorithm; only uses the first ring if there are multiple
 
@@ -8702,7 +8541,7 @@ var Polygon = Polyline.extend({
 
 	_convertLatLngs: function (latlngs) {
 		var result = Polyline.prototype._convertLatLngs.call(this, latlngs),
-			len = result.length;
+		    len = result.length;
 
 		// remove last point if it equals first one
 		if (len >= 2 && result[0] instanceof LatLng && result[0].equals(result[len - 1])) {
@@ -8726,8 +8565,8 @@ var Polygon = Polyline.extend({
 		// polygons need a different clipping algorithm so we redefine that
 
 		var bounds = this._renderer._bounds,
-			w = this.options.weight,
-			p = new Point(w, w);
+		    w = this.options.weight,
+		    p = new Point(w, w);
 
 		// increase clip padding by stroke width to avoid stroke on clip edges
 		bounds = new Bounds(bounds.min.subtract(p), bounds.max.add(p));
@@ -8757,11 +8596,9 @@ var Polygon = Polyline.extend({
 	// Needed by the `Canvas` renderer for interactivity
 	_containsPoint: function (p) {
 		var inside = false,
-			part, p1, p2, i, j, k, len, len2;
+		    part, p1, p2, i, j, k, len, len2;
 
-		if (!this._pxBounds || !this._pxBounds.contains(p)) {
-			return false;
-		}
+		if (!this._pxBounds || !this._pxBounds.contains(p)) { return false; }
 
 		// ray casting algorithm for detecting if point is in polygon
 		for (i = 0, len = this._parts.length; i < len; i++) {
@@ -8876,7 +8713,7 @@ var GeoJSON = FeatureGroup.extend({
 	// Adds a GeoJSON object to the layer.
 	addData: function (geojson) {
 		var features = isArray(geojson) ? geojson : geojson.features,
-			i, len, feature;
+		    i, len, feature;
 
 		if (features) {
 			for (i = 0, len = features.length; i < len; i++) {
@@ -8891,9 +8728,7 @@ var GeoJSON = FeatureGroup.extend({
 
 		var options = this.options;
 
-		if (options.filter && !options.filter(geojson)) {
-			return this;
-		}
+		if (options.filter && !options.filter(geojson)) { return this; }
 
 		var layer = geometryToLayer(geojson, options);
 		if (!layer) {
@@ -8952,54 +8787,54 @@ var GeoJSON = FeatureGroup.extend({
 function geometryToLayer(geojson, options) {
 
 	var geometry = geojson.type === 'Feature' ? geojson.geometry : geojson,
-		coords = geometry ? geometry.coordinates : null,
-		layers = [],
-		pointToLayer = options && options.pointToLayer,
-		_coordsToLatLng = options && options.coordsToLatLng || coordsToLatLng,
-		latlng, latlngs, i, len;
+	    coords = geometry ? geometry.coordinates : null,
+	    layers = [],
+	    pointToLayer = options && options.pointToLayer,
+	    _coordsToLatLng = options && options.coordsToLatLng || coordsToLatLng,
+	    latlng, latlngs, i, len;
 
 	if (!coords && !geometry) {
 		return null;
 	}
 
 	switch (geometry.type) {
-		case 'Point':
-			latlng = _coordsToLatLng(coords);
-			return _pointToLayer(pointToLayer, geojson, latlng, options);
+	case 'Point':
+		latlng = _coordsToLatLng(coords);
+		return _pointToLayer(pointToLayer, geojson, latlng, options);
 
-		case 'MultiPoint':
-			for (i = 0, len = coords.length; i < len; i++) {
-				latlng = _coordsToLatLng(coords[i]);
-				layers.push(_pointToLayer(pointToLayer, geojson, latlng, options));
+	case 'MultiPoint':
+		for (i = 0, len = coords.length; i < len; i++) {
+			latlng = _coordsToLatLng(coords[i]);
+			layers.push(_pointToLayer(pointToLayer, geojson, latlng, options));
+		}
+		return new FeatureGroup(layers);
+
+	case 'LineString':
+	case 'MultiLineString':
+		latlngs = coordsToLatLngs(coords, geometry.type === 'LineString' ? 0 : 1, _coordsToLatLng);
+		return new Polyline(latlngs, options);
+
+	case 'Polygon':
+	case 'MultiPolygon':
+		latlngs = coordsToLatLngs(coords, geometry.type === 'Polygon' ? 1 : 2, _coordsToLatLng);
+		return new Polygon(latlngs, options);
+
+	case 'GeometryCollection':
+		for (i = 0, len = geometry.geometries.length; i < len; i++) {
+			var layer = geometryToLayer({
+				geometry: geometry.geometries[i],
+				type: 'Feature',
+				properties: geojson.properties
+			}, options);
+
+			if (layer) {
+				layers.push(layer);
 			}
-			return new FeatureGroup(layers);
+		}
+		return new FeatureGroup(layers);
 
-		case 'LineString':
-		case 'MultiLineString':
-			latlngs = coordsToLatLngs(coords, geometry.type === 'LineString' ? 0 : 1, _coordsToLatLng);
-			return new Polyline(latlngs, options);
-
-		case 'Polygon':
-		case 'MultiPolygon':
-			latlngs = coordsToLatLngs(coords, geometry.type === 'Polygon' ? 1 : 2, _coordsToLatLng);
-			return new Polygon(latlngs, options);
-
-		case 'GeometryCollection':
-			for (i = 0, len = geometry.geometries.length; i < len; i++) {
-				var layer = geometryToLayer({
-					geometry: geometry.geometries[i],
-					type: 'Feature',
-					properties: geojson.properties
-				}, options);
-
-				if (layer) {
-					layers.push(layer);
-				}
-			}
-			return new FeatureGroup(layers);
-
-		default:
-			throw new Error('Invalid GeoJSON object.');
+	default:
+		throw new Error('Invalid GeoJSON object.');
 	}
 }
 
@@ -9134,7 +8969,7 @@ Polyline.include({
 Polygon.include({
 	toGeoJSON: function (precision) {
 		var holes = !isFlat(this._latlngs),
-			multi = holes && !isFlat(this._latlngs[0]);
+		    multi = holes && !isFlat(this._latlngs[0]);
 
 		var coords = latLngsToCoords(this._latlngs, multi ? 2 : holes ? 1 : 0, true, precision);
 
@@ -9178,7 +9013,7 @@ LayerGroup.include({
 		}
 
 		var isGeometryCollection = type === 'GeometryCollection',
-			jsons = [];
+		    jsons = [];
 
 		this.eachLayer(function (layer) {
 			if (layer.toGeoJSON) {
@@ -9404,12 +9239,8 @@ var ImageOverlay = Layer.extend({
 		var img = this._image = wasElementSupplied ? this._url : create$1('img');
 
 		addClass(img, 'leaflet-image-layer');
-		if (this._zoomAnimated) {
-			addClass(img, 'leaflet-zoom-animated');
-		}
-		if (this.options.className) {
-			addClass(img, this.options.className);
-		}
+		if (this._zoomAnimated) { addClass(img, 'leaflet-zoom-animated'); }
+		if (this.options.className) { addClass(img, this.options.className); }
 
 		img.onselectstart = falseFn;
 		img.onmousemove = falseFn;
@@ -9438,21 +9269,21 @@ var ImageOverlay = Layer.extend({
 
 	_animateZoom: function (e) {
 		var scale = this._map.getZoomScale(e.zoom),
-			offset = this._map._latLngBoundsToNewLayerBounds(this._bounds, e.zoom, e.center).min;
+		    offset = this._map._latLngBoundsToNewLayerBounds(this._bounds, e.zoom, e.center).min;
 
 		setTransform(this._image, offset, scale);
 	},
 
 	_reset: function () {
 		var image = this._image,
-			bounds = new Bounds(
-				this._map.latLngToLayerPoint(this._bounds.getNorthWest()),
-				this._map.latLngToLayerPoint(this._bounds.getSouthEast())),
-			size = bounds.getSize();
+		    bounds = new Bounds(
+		        this._map.latLngToLayerPoint(this._bounds.getNorthWest()),
+		        this._map.latLngToLayerPoint(this._bounds.getSouthEast())),
+		    size = bounds.getSize();
 
 		setPosition(image, bounds.min);
 
-		image.style.width = size.x + 'px';
+		image.style.width  = size.x + 'px';
 		image.style.height = size.y + 'px';
 	},
 
@@ -9529,12 +9360,8 @@ var VideoOverlay = ImageOverlay.extend({
 		var vid = this._image = wasElementSupplied ? this._url : create$1('video');
 
 		addClass(vid, 'leaflet-image-layer');
-		if (this._zoomAnimated) {
-			addClass(vid, 'leaflet-zoom-animated');
-		}
-		if (this.options.className) {
-			addClass(vid, this.options.className);
-		}
+		if (this._zoomAnimated) { addClass(vid, 'leaflet-zoom-animated'); }
+		if (this.options.className) { addClass(vid, this.options.className); }
 
 		vid.onselectstart = falseFn;
 		vid.onmousemove = falseFn;
@@ -9554,13 +9381,9 @@ var VideoOverlay = ImageOverlay.extend({
 			return;
 		}
 
-		if (!isArray(this._url)) {
-			this._url = [this._url];
-		}
+		if (!isArray(this._url)) { this._url = [this._url]; }
 
-		if (!this.options.keepAspectRatio && vid.style.hasOwnProperty('objectFit')) {
-			vid.style['objectFit'] = 'fill';
-		}
+		if (!this.options.keepAspectRatio && vid.style.hasOwnProperty('objectFit')) { vid.style['objectFit'] = 'fill'; }
 		vid.autoplay = !!this.options.autoplay;
 		vid.loop = !!this.options.loop;
 		for (var i = 0; i < this._url.length; i++) {
@@ -9610,12 +9433,8 @@ var SVGOverlay = ImageOverlay.extend({
 		var el = this._image = this._url;
 
 		addClass(el, 'leaflet-image-layer');
-		if (this._zoomAnimated) {
-			addClass(el, 'leaflet-zoom-animated');
-		}
-		if (this.options.className) {
-			addClass(el, this.options.className);
-		}
+		if (this._zoomAnimated) { addClass(el, 'leaflet-zoom-animated'); }
+		if (this.options.className) { addClass(el, this.options.className); }
 
 		el.onselectstart = falseFn;
 		el.onmousemove = falseFn;
@@ -9740,9 +9559,7 @@ var DivOverlay = Layer.extend({
 	// @method update: null
 	// Updates the popup content, layout and position. Useful for updating the popup after something inside changed, e.g. image loaded.
 	update: function () {
-		if (!this._map) {
-			return;
-		}
+		if (!this._map) { return; }
 
 		this._container.style.visibility = 'hidden';
 
@@ -9824,9 +9641,7 @@ var DivOverlay = Layer.extend({
 	},
 
 	_updateContent: function () {
-		if (!this._content) {
-			return;
-		}
+		if (!this._content) { return; }
 
 		var node = this._contentNode;
 		var content = (typeof this._content === 'function') ? this._content(this._source || this) : this._content;
@@ -9843,13 +9658,11 @@ var DivOverlay = Layer.extend({
 	},
 
 	_updatePosition: function () {
-		if (!this._map) {
-			return;
-		}
+		if (!this._map) { return; }
 
 		var pos = this._map.latLngToLayerPoint(this._latlng),
-			offset = toPoint(this.options.offset),
-			anchor = this._getAnchor();
+		    offset = toPoint(this.options.offset),
+		    anchor = this._getAnchor();
 
 		if (this._zoomAnimated) {
 			setPosition(this._container, pos.add(anchor));
@@ -9858,7 +9671,7 @@ var DivOverlay = Layer.extend({
 		}
 
 		var bottom = this._containerBottom = -offset.y,
-			left = this._containerLeft = -Math.round(this._containerWidth / 2) + offset.x;
+		    left = this._containerLeft = -Math.round(this._containerWidth / 2) + offset.x;
 
 		// bottom position the popup in case the height of the popup changes (images loading etc)
 		this._container.style.bottom = bottom + 'px';
@@ -10038,9 +9851,9 @@ var Popup = DivOverlay.extend({
 
 	_initLayout: function () {
 		var prefix = 'leaflet-popup',
-			container = this._container = create$1('div',
-				prefix + ' ' + (this.options.className || '') +
-				' leaflet-zoom-animated');
+		    container = this._container = create$1('div',
+			prefix + ' ' + (this.options.className || '') +
+			' leaflet-zoom-animated');
 
 		var wrapper = this._wrapper = create$1('div', prefix + '-content-wrapper', container);
 		this._contentNode = create$1('div', prefix + '-content', wrapper);
@@ -10063,7 +9876,7 @@ var Popup = DivOverlay.extend({
 
 	_updateLayout: function () {
 		var container = this._contentNode,
-			style = container.style;
+		    style = container.style;
 
 		style.width = '';
 		style.whiteSpace = 'nowrap';
@@ -10078,8 +9891,8 @@ var Popup = DivOverlay.extend({
 		style.height = '';
 
 		var height = container.offsetHeight,
-			maxHeight = this.options.maxHeight,
-			scrolledClass = 'leaflet-popup-scrolled';
+		    maxHeight = this.options.maxHeight,
+		    scrolledClass = 'leaflet-popup-scrolled';
 
 		if (maxHeight && height > maxHeight) {
 			style.height = maxHeight + 'px';
@@ -10093,33 +9906,29 @@ var Popup = DivOverlay.extend({
 
 	_animateZoom: function (e) {
 		var pos = this._map._latLngToNewLayerPoint(this._latlng, e.zoom, e.center),
-			anchor = this._getAnchor();
+		    anchor = this._getAnchor();
 		setPosition(this._container, pos.add(anchor));
 	},
 
 	_adjustPan: function () {
-		if (!this.options.autoPan) {
-			return;
-		}
-		if (this._map._panAnim) {
-			this._map._panAnim.stop();
-		}
+		if (!this.options.autoPan) { return; }
+		if (this._map._panAnim) { this._map._panAnim.stop(); }
 
 		var map = this._map,
-			marginBottom = parseInt(getStyle(this._container, 'marginBottom'), 10) || 0,
-			containerHeight = this._container.offsetHeight + marginBottom,
-			containerWidth = this._containerWidth,
-			layerPos = new Point(this._containerLeft, -containerHeight - this._containerBottom);
+		    marginBottom = parseInt(getStyle(this._container, 'marginBottom'), 10) || 0,
+		    containerHeight = this._container.offsetHeight + marginBottom,
+		    containerWidth = this._containerWidth,
+		    layerPos = new Point(this._containerLeft, -containerHeight - this._containerBottom);
 
 		layerPos._add(getPosition(this._container));
 
 		var containerPos = map.layerPointToContainerPoint(layerPos),
-			padding = toPoint(this.options.autoPanPadding),
-			paddingTL = toPoint(this.options.autoPanPaddingTopLeft || padding),
-			paddingBR = toPoint(this.options.autoPanPaddingBottomRight || padding),
-			size = map.getSize(),
-			dx = 0,
-			dy = 0;
+		    padding = toPoint(this.options.autoPanPadding),
+		    paddingTL = toPoint(this.options.autoPanPaddingTopLeft || padding),
+		    paddingBR = toPoint(this.options.autoPanPaddingBottomRight || padding),
+		    size = map.getSize(),
+		    dx = 0,
+		    dy = 0;
 
 		if (containerPos.x + containerWidth + paddingBR.x > size.x) { // right
 			dx = containerPos.x + containerWidth - size.x + paddingBR.x;
@@ -10140,8 +9949,8 @@ var Popup = DivOverlay.extend({
 		// Fired when the map starts autopanning when opening a popup.
 		if (dx || dy) {
 			map
-				.fire('autopanstart')
-				.panBy([dx, dy]);
+			    .fire('autopanstart')
+			    .panBy([dx, dy]);
 		}
 	},
 
@@ -10493,27 +10302,25 @@ var Tooltip = DivOverlay.extend({
 
 	_initLayout: function () {
 		var prefix = 'leaflet-tooltip',
-			className = prefix + ' ' + (this.options.className || '') + ' leaflet-zoom-' + (this._zoomAnimated ? 'animated' : 'hide');
+		    className = prefix + ' ' + (this.options.className || '') + ' leaflet-zoom-' + (this._zoomAnimated ? 'animated' : 'hide');
 
 		this._contentNode = this._container = create$1('div', className);
 	},
 
-	_updateLayout: function () {
-	},
+	_updateLayout: function () {},
 
-	_adjustPan: function () {
-	},
+	_adjustPan: function () {},
 
 	_setPosition: function (pos) {
 		var map = this._map,
-			container = this._container,
-			centerPoint = map.latLngToContainerPoint(map.getCenter()),
-			tooltipPoint = map.layerPointToContainerPoint(pos),
-			direction = this.options.direction,
-			tooltipWidth = container.offsetWidth,
-			tooltipHeight = container.offsetHeight,
-			offset = toPoint(this.options.offset),
-			anchor = this._getAnchor();
+		    container = this._container,
+		    centerPoint = map.latLngToContainerPoint(map.getCenter()),
+		    tooltipPoint = map.layerPointToContainerPoint(pos),
+		    direction = this.options.direction,
+		    tooltipWidth = container.offsetWidth,
+		    tooltipHeight = container.offsetHeight,
+		    offset = toPoint(this.options.offset),
+		    anchor = this._getAnchor();
 
 		if (direction === 'top') {
 			pos = pos.add(toPoint(-tooltipWidth / 2 + offset.x, -tooltipHeight + offset.y + anchor.y, true));
@@ -10660,14 +10467,12 @@ Layer.include({
 	},
 
 	_initTooltipInteractions: function (remove$$1) {
-		if (!remove$$1 && this._tooltipHandlersAdded) {
-			return;
-		}
+		if (!remove$$1 && this._tooltipHandlersAdded) { return; }
 		var onOff = remove$$1 ? 'off' : 'on',
-			events = {
-				remove: this.closeTooltip,
-				move: this._moveTooltip
-			};
+		    events = {
+			remove: this.closeTooltip,
+			move: this._moveTooltip
+		    };
 		if (!this._tooltip.options.permanent) {
 			events.mouseover = this._openTooltip;
 			events.mouseout = this.closeTooltip;
@@ -10813,7 +10618,7 @@ var DivIcon = Icon.extend({
 
 	createIcon: function (oldIcon) {
 		var div = (oldIcon && oldIcon.tagName === 'DIV') ? oldIcon : document.createElement('div'),
-			options = this.options;
+		    options = this.options;
 
 		if (options.html instanceof Element) {
 			empty(div);
@@ -11124,7 +10929,7 @@ var GridLayer = Layer.extend({
 		// go through all other layers of the same pane, set zIndex to max + 1 (front) or min - 1 (back)
 
 		var layers = this.getPane().children,
-			edgeZIndex = -compare(-Infinity, Infinity); // -Infinity for max, Infinity for min
+		    edgeZIndex = -compare(-Infinity, Infinity); // -Infinity for max, Infinity for min
 
 		for (var i = 0, len = layers.length, zIndex; i < len; i++) {
 
@@ -11142,26 +10947,20 @@ var GridLayer = Layer.extend({
 	},
 
 	_updateOpacity: function () {
-		if (!this._map) {
-			return;
-		}
+		if (!this._map) { return; }
 
 		// IE doesn't inherit filter opacity properly, so we're forced to set it on tiles
-		if (ielt9) {
-			return;
-		}
+		if (ielt9) { return; }
 
 		setOpacity(this._container, this.options.opacity);
 
 		var now = +new Date(),
-			nextFrame = false,
-			willPrune = false;
+		    nextFrame = false,
+		    willPrune = false;
 
 		for (var key in this._tiles) {
 			var tile = this._tiles[key];
-			if (!tile.current || !tile.loaded) {
-				continue;
-			}
+			if (!tile.current || !tile.loaded) { continue; }
 
 			var fade = Math.min(1, (now - tile.loaded) / 200);
 
@@ -11178,9 +10977,7 @@ var GridLayer = Layer.extend({
 			}
 		}
 
-		if (willPrune && !this._noPrune) {
-			this._pruneTiles();
-		}
+		if (willPrune && !this._noPrune) { this._pruneTiles(); }
 
 		if (nextFrame) {
 			cancelAnimFrame(this._fadeFrame);
@@ -11191,9 +10988,7 @@ var GridLayer = Layer.extend({
 	_onOpaqueTile: falseFn,
 
 	_initContainer: function () {
-		if (this._container) {
-			return;
-		}
+		if (this._container) { return; }
 
 		this._container = create$1('div', 'leaflet-layer ' + (this.options.className || ''));
 		this._updateZIndex();
@@ -11208,11 +11003,9 @@ var GridLayer = Layer.extend({
 	_updateLevels: function () {
 
 		var zoom = this._tileZoom,
-			maxZoom = this.options.maxZoom;
+		    maxZoom = this.options.maxZoom;
 
-		if (zoom === undefined) {
-			return undefined;
-		}
+		if (zoom === undefined) { return undefined; }
 
 		for (var z in this._levels) {
 			if (this._levels[z].el.children.length || z === zoom) {
@@ -11227,7 +11020,7 @@ var GridLayer = Layer.extend({
 		}
 
 		var level = this._levels[zoom],
-			map = this._map;
+		    map = this._map;
 
 		if (!level) {
 			level = this._levels[zoom] = {};
@@ -11321,13 +11114,13 @@ var GridLayer = Layer.extend({
 
 	_retainParent: function (x, y, z, minZoom) {
 		var x2 = Math.floor(x / 2),
-			y2 = Math.floor(y / 2),
-			z2 = z - 1,
-			coords2 = new Point(+x2, +y2);
+		    y2 = Math.floor(y / 2),
+		    z2 = z - 1,
+		    coords2 = new Point(+x2, +y2);
 		coords2.z = +z2;
 
 		var key = this._tileCoordsToKey(coords2),
-			tile = this._tiles[key];
+		    tile = this._tiles[key];
 
 		if (tile && tile.active) {
 			tile.retain = true;
@@ -11353,7 +11146,7 @@ var GridLayer = Layer.extend({
 				coords.z = z + 1;
 
 				var key = this._tileCoordsToKey(coords),
-					tile = this._tiles[key];
+				    tile = this._tiles[key];
 
 				if (tile && tile.active) {
 					tile.retain = true;
@@ -11396,7 +11189,7 @@ var GridLayer = Layer.extend({
 	_setView: function (center, zoom, noPrune, noUpdate) {
 		var tileZoom = this._clampZoom(Math.round(zoom));
 		if ((this.options.maxZoom !== undefined && tileZoom > this.options.maxZoom) ||
-			(this.options.minZoom !== undefined && tileZoom < this.options.minZoom)) {
+		    (this.options.minZoom !== undefined && tileZoom < this.options.minZoom)) {
 			tileZoom = undefined;
 		}
 
@@ -11437,8 +11230,8 @@ var GridLayer = Layer.extend({
 
 	_setZoomTransform: function (level, center, zoom) {
 		var scale = this._map.getZoomScale(zoom, level.zoom),
-			translate = level.origin.multiplyBy(scale)
-				.subtract(this._map._getNewPixelOrigin(center, zoom)).round();
+		    translate = level.origin.multiplyBy(scale)
+		        .subtract(this._map._getNewPixelOrigin(center, zoom)).round();
 
 		if (any3d) {
 			setTransform(level.el, translate, scale);
@@ -11449,9 +11242,9 @@ var GridLayer = Layer.extend({
 
 	_resetGrid: function () {
 		var map = this._map,
-			crs = map.options.crs,
-			tileSize = this._tileSize = this.getTileSize(),
-			tileZoom = this._tileZoom;
+		    crs = map.options.crs,
+		    tileSize = this._tileSize = this.getTileSize(),
+		    tileZoom = this._tileZoom;
 
 		var bounds = this._map.getPixelWorldBounds(this._tileZoom);
 		if (bounds) {
@@ -11469,19 +11262,17 @@ var GridLayer = Layer.extend({
 	},
 
 	_onMoveEnd: function () {
-		if (!this._map || this._map._animatingZoom) {
-			return;
-		}
+		if (!this._map || this._map._animatingZoom) { return; }
 
 		this._update();
 	},
 
 	_getTiledPixelBounds: function (center) {
 		var map = this._map,
-			mapZoom = map._animatingZoom ? Math.max(map._animateToZoom, map.getZoom()) : map.getZoom(),
-			scale = map.getZoomScale(mapZoom, this._tileZoom),
-			pixelCenter = map.project(center, this._tileZoom).floor(),
-			halfSize = map.getSize().divideBy(scale * 2);
+		    mapZoom = map._animatingZoom ? Math.max(map._animateToZoom, map.getZoom()) : map.getZoom(),
+		    scale = map.getZoomScale(mapZoom, this._tileZoom),
+		    pixelCenter = map.project(center, this._tileZoom).floor(),
+		    halfSize = map.getSize().divideBy(scale * 2);
 
 		return new Bounds(pixelCenter.subtract(halfSize), pixelCenter.add(halfSize));
 	},
@@ -11489,33 +11280,25 @@ var GridLayer = Layer.extend({
 	// Private method to load tiles in the grid's active zoom level according to map bounds
 	_update: function (center) {
 		var map = this._map;
-		if (!map) {
-			return;
-		}
+		if (!map) { return; }
 		var zoom = this._clampZoom(map.getZoom());
 
-		if (center === undefined) {
-			center = map.getCenter();
-		}
-		if (this._tileZoom === undefined) {
-			return;
-		}	// if out of minzoom/maxzoom
+		if (center === undefined) { center = map.getCenter(); }
+		if (this._tileZoom === undefined) { return; }	// if out of minzoom/maxzoom
 
 		var pixelBounds = this._getTiledPixelBounds(center),
-			tileRange = this._pxBoundsToTileRange(pixelBounds),
-			tileCenter = tileRange.getCenter(),
-			queue = [],
-			margin = this.options.keepBuffer,
-			noPruneRange = new Bounds(tileRange.getBottomLeft().subtract([margin, -margin]),
-				tileRange.getTopRight().add([margin, -margin]));
+		    tileRange = this._pxBoundsToTileRange(pixelBounds),
+		    tileCenter = tileRange.getCenter(),
+		    queue = [],
+		    margin = this.options.keepBuffer,
+		    noPruneRange = new Bounds(tileRange.getBottomLeft().subtract([margin, -margin]),
+		                              tileRange.getTopRight().add([margin, -margin]));
 
 		// Sanity check: panic if the tile range contains Infinity somewhere.
 		if (!(isFinite(tileRange.min.x) &&
-			isFinite(tileRange.min.y) &&
-			isFinite(tileRange.max.x) &&
-			isFinite(tileRange.max.y))) {
-			throw new Error('Attempted to load an infinite number of tiles');
-		}
+		      isFinite(tileRange.min.y) &&
+		      isFinite(tileRange.max.x) &&
+		      isFinite(tileRange.max.y))) { throw new Error('Attempted to load an infinite number of tiles'); }
 
 		for (var key in this._tiles) {
 			var c = this._tiles[key].coords;
@@ -11526,10 +11309,7 @@ var GridLayer = Layer.extend({
 
 		// _update just loads more tiles. If the tile zoom level differs too much
 		// from the map's, let _setView reset levels and prune old tiles.
-		if (Math.abs(zoom - this._tileZoom) > 1) {
-			this._setView(center, zoom);
-			return;
-		}
+		if (Math.abs(zoom - this._tileZoom) > 1) { this._setView(center, zoom); return; }
 
 		// create a queue of coordinates to load tiles from
 		for (var j = tileRange.min.y; j <= tileRange.max.y; j++) {
@@ -11537,9 +11317,7 @@ var GridLayer = Layer.extend({
 				var coords = new Point(i, j);
 				coords.z = this._tileZoom;
 
-				if (!this._isValidTile(coords)) {
-					continue;
-				}
+				if (!this._isValidTile(coords)) { continue; }
 
 				var tile = this._tiles[this._tileCoordsToKey(coords)];
 				if (tile) {
@@ -11582,14 +11360,10 @@ var GridLayer = Layer.extend({
 			// don't load tile if it's out of bounds and not wrapped
 			var bounds = this._globalTileRange;
 			if ((!crs.wrapLng && (coords.x < bounds.min.x || coords.x > bounds.max.x)) ||
-				(!crs.wrapLat && (coords.y < bounds.min.y || coords.y > bounds.max.y))) {
-				return false;
-			}
+			    (!crs.wrapLat && (coords.y < bounds.min.y || coords.y > bounds.max.y))) { return false; }
 		}
 
-		if (!this.options.bounds) {
-			return true;
-		}
+		if (!this.options.bounds) { return true; }
 
 		// don't load tile if it doesn't intersect the bounds in options
 		var tileBounds = this._tileCoordsToBounds(coords);
@@ -11602,18 +11376,18 @@ var GridLayer = Layer.extend({
 
 	_tileCoordsToNwSe: function (coords) {
 		var map = this._map,
-			tileSize = this.getTileSize(),
-			nwPoint = coords.scaleBy(tileSize),
-			sePoint = nwPoint.add(tileSize),
-			nw = map.unproject(nwPoint, coords.z),
-			se = map.unproject(sePoint, coords.z);
+		    tileSize = this.getTileSize(),
+		    nwPoint = coords.scaleBy(tileSize),
+		    sePoint = nwPoint.add(tileSize),
+		    nw = map.unproject(nwPoint, coords.z),
+		    se = map.unproject(sePoint, coords.z);
 		return [nw, se];
 	},
 
 	// converts tile coordinates to its geographical bounds
 	_tileCoordsToBounds: function (coords) {
 		var bp = this._tileCoordsToNwSe(coords),
-			bounds = new LatLngBounds(bp[0], bp[1]);
+		    bounds = new LatLngBounds(bp[0], bp[1]);
 
 		if (!this.options.noWrap) {
 			bounds = this._map.wrapLatLngBounds(bounds);
@@ -11628,16 +11402,14 @@ var GridLayer = Layer.extend({
 	// converts tile cache key to coordinates
 	_keyToTileCoords: function (key) {
 		var k = key.split(':'),
-			coords = new Point(+k[0], +k[1]);
+		    coords = new Point(+k[0], +k[1]);
 		coords.z = +k[2];
 		return coords;
 	},
 
 	_removeTile: function (key) {
 		var tile = this._tiles[key];
-		if (!tile) {
-			return;
-		}
+		if (!tile) { return; }
 
 		remove(tile.el);
 
@@ -11675,7 +11447,7 @@ var GridLayer = Layer.extend({
 
 	_addTile: function (coords, container) {
 		var tilePos = this._getTilePos(coords),
-			key = this._tileCoordsToKey(coords);
+		    key = this._tileCoordsToKey(coords);
 
 		var tile = this.createTile(this._wrapCoords(coords), bind(this._tileReady, this, coords));
 
@@ -11720,9 +11492,7 @@ var GridLayer = Layer.extend({
 		var key = this._tileCoordsToKey(coords);
 
 		tile = this._tiles[key];
-		if (!tile) {
-			return;
-		}
+		if (!tile) { return; }
 
 		tile.loaded = +new Date();
 		if (this._map._fadeAnimated) {
@@ -11782,9 +11552,7 @@ var GridLayer = Layer.extend({
 
 	_noTilesToLoad: function () {
 		for (var key in this._tiles) {
-			if (!this._tiles[key].loaded) {
-				return false;
-			}
+			if (!this._tiles[key].loaded) { return false; }
 		}
 		return true;
 	}
@@ -11999,9 +11767,9 @@ var TileLayer = GridLayer.extend({
 
 	_getZoomForUrl: function () {
 		var zoom = this._tileZoom,
-			maxZoom = this.options.maxZoom,
-			zoomReverse = this.options.zoomReverse,
-			zoomOffset = this.options.zoomOffset;
+		maxZoom = this.options.maxZoom,
+		zoomReverse = this.options.zoomReverse,
+		zoomOffset = this.options.zoomOffset;
 
 		if (zoomReverse) {
 			zoom = maxZoom - zoom;
@@ -12036,9 +11804,7 @@ var TileLayer = GridLayer.extend({
 
 	_removeTile: function (key) {
 		var tile = this._tiles[key];
-		if (!tile) {
-			return;
-		}
+		if (!tile) { return; }
 
 		// Cancels any pending http requests associated with the tile
 		// unless we're on Android's stock browser,
@@ -12165,14 +11931,14 @@ var TileLayerWMS = TileLayer.extend({
 	getTileUrl: function (coords) {
 
 		var tileBounds = this._tileCoordsToNwSe(coords),
-			crs = this._crs,
-			bounds = toBounds(crs.project(tileBounds[0]), crs.project(tileBounds[1])),
-			min = bounds.min,
-			max = bounds.max,
-			bbox = (this._wmsVersion >= 1.3 && this._crs === EPSG4326 ?
-				[min.y, min.x, max.y, max.x] :
-				[min.x, min.y, max.x, max.y]).join(','),
-			url = TileLayer.prototype.getTileUrl.call(this, coords);
+		    crs = this._crs,
+		    bounds = toBounds(crs.project(tileBounds[0]), crs.project(tileBounds[1])),
+		    min = bounds.min,
+		    max = bounds.max,
+		    bbox = (this._wmsVersion >= 1.3 && this._crs === EPSG4326 ?
+		    [min.y, min.x, max.y, max.x] :
+		    [min.x, min.y, max.x, max.y]).join(','),
+		    url = TileLayer.prototype.getTileUrl.call(this, coords);
 		return url +
 			getParamString(this.wmsParams, url, this.options.uppercase) +
 			(this.options.uppercase ? '&BBOX=' : '&bbox=') + bbox;
@@ -12234,7 +12000,7 @@ var Renderer = Layer.extend({
 
 		// @option tolerance: Number = 0
 		// How much to extend click tolerance round a path/object on the map
-		tolerance: 0
+		tolerance : 0
 	},
 
 	initialize: function (options) {
@@ -12285,13 +12051,13 @@ var Renderer = Layer.extend({
 
 	_updateTransform: function (center, zoom) {
 		var scale = this._map.getZoomScale(zoom, this._zoom),
-			position = getPosition(this._container),
-			viewHalf = this._map.getSize().multiplyBy(0.5 + this.options.padding),
-			currentCenterPoint = this._map.project(this._center, zoom),
-			destCenterPoint = this._map.project(center, zoom),
-			centerOffset = destCenterPoint.subtract(currentCenterPoint),
+		    position = getPosition(this._container),
+		    viewHalf = this._map.getSize().multiplyBy(0.5 + this.options.padding),
+		    currentCenterPoint = this._map.project(this._center, zoom),
+		    destCenterPoint = this._map.project(center, zoom),
+		    centerOffset = destCenterPoint.subtract(currentCenterPoint),
 
-			topLeftOffset = viewHalf.multiplyBy(-scale).add(position).add(viewHalf).subtract(centerOffset);
+		    topLeftOffset = viewHalf.multiplyBy(-scale).add(position).add(viewHalf).subtract(centerOffset);
 
 		if (any3d) {
 			setTransform(this._container, topLeftOffset, scale);
@@ -12325,8 +12091,8 @@ var Renderer = Layer.extend({
 		// Update pixel bounds of renderer container (for positioning/sizing/clipping later)
 		// Subclasses are responsible of firing the 'update' event.
 		var p = this.options.padding,
-			size = this._map.getSize(),
-			min = this._map.containerPointToLayerPoint(size.multiplyBy(-p)).round();
+		    size = this._map.getSize(),
+		    min = this._map.containerPointToLayerPoint(size.multiplyBy(-p)).round();
 
 		this._bounds = new Bounds(min, min.add(size.multiplyBy(1 + p * 2)).round());
 
@@ -12406,9 +12172,7 @@ var Canvas = Renderer.extend({
 	},
 
 	_updatePaths: function () {
-		if (this._postponeUpdatePaths) {
-			return;
-		}
+		if (this._postponeUpdatePaths) { return; }
 
 		var layer;
 		this._redrawBounds = null;
@@ -12420,16 +12184,14 @@ var Canvas = Renderer.extend({
 	},
 
 	_update: function () {
-		if (this._map._animatingZoom && this._bounds) {
-			return;
-		}
+		if (this._map._animatingZoom && this._bounds) { return; }
 
 		Renderer.prototype._update.call(this);
 
 		var b = this._bounds,
-			container = this._container,
-			size = b.getSize(),
-			m = retina ? 2 : 1;
+		    container = this._container,
+		    size = b.getSize(),
+		    m = retina ? 2 : 1;
 
 		setPosition(container, b.min);
 
@@ -12468,9 +12230,7 @@ var Canvas = Renderer.extend({
 			prev: this._drawLast,
 			next: null
 		};
-		if (this._drawLast) {
-			this._drawLast.next = order;
-		}
+		if (this._drawLast) { this._drawLast.next = order; }
 		this._drawLast = order;
 		this._drawFirst = this._drawFirst || this._drawLast;
 	},
@@ -12521,15 +12281,13 @@ var Canvas = Renderer.extend({
 	_updateDashArray: function (layer) {
 		if (typeof layer.options.dashArray === 'string') {
 			var parts = layer.options.dashArray.split(/[, ]+/),
-				dashArray = [],
-				dashValue,
-				i;
+			    dashArray = [],
+			    dashValue,
+			    i;
 			for (i = 0; i < parts.length; i++) {
 				dashValue = Number(parts[i]);
 				// Ignore dash array containing invalid lengths
-				if (isNaN(dashValue)) {
-					return;
-				}
+				if (isNaN(dashValue)) { return; }
 				dashArray.push(dashValue);
 			}
 			layer.options._dashArray = dashArray;
@@ -12539,9 +12297,7 @@ var Canvas = Renderer.extend({
 	},
 
 	_requestRedraw: function (layer) {
-		if (!this._map) {
-			return;
-		}
+		if (!this._map) { return; }
 
 		this._extendRedrawBounds(layer);
 		this._redrawRequest = this._redrawRequest || requestAnimFrame(this._redraw, this);
@@ -12605,18 +12361,14 @@ var Canvas = Renderer.extend({
 	},
 
 	_updatePoly: function (layer, closed) {
-		if (!this._drawing) {
-			return;
-		}
+		if (!this._drawing) { return; }
 
 		var i, j, len2, p,
-			parts = layer._parts,
-			len = parts.length,
-			ctx = this._ctx;
+		    parts = layer._parts,
+		    len = parts.length,
+		    ctx = this._ctx;
 
-		if (!len) {
-			return;
-		}
+		if (!len) { return; }
 
 		ctx.beginPath();
 
@@ -12637,14 +12389,12 @@ var Canvas = Renderer.extend({
 
 	_updateCircle: function (layer) {
 
-		if (!this._drawing || layer._empty()) {
-			return;
-		}
+		if (!this._drawing || layer._empty()) { return; }
 
 		var p = layer._point,
-			ctx = this._ctx,
-			r = Math.max(Math.round(layer._radius), 1),
-			s = (Math.max(Math.round(layer._radiusY), 1) || r) / r;
+		    ctx = this._ctx,
+		    r = Math.max(Math.round(layer._radius), 1),
+		    s = (Math.max(Math.round(layer._radiusY), 1) || r) / r;
 
 		if (s !== 1) {
 			ctx.save();
@@ -12695,16 +12445,14 @@ var Canvas = Renderer.extend({
 				clickedLayer = layer;
 			}
 		}
-		if (clickedLayer) {
+		if (clickedLayer)  {
 			fakeStop(e);
 			this._fireEvent([clickedLayer], e);
 		}
 	},
 
 	_onMouseMove: function (e) {
-		if (!this._map || this._map.dragging.moving() || this._map._animatingZoom) {
-			return;
-		}
+		if (!this._map || this._map.dragging.moving() || this._map._animatingZoom) { return; }
 
 		var point = this._map.mouseEventToLayerPoint(e);
 		this._handleMouseHover(e, point);
@@ -12763,9 +12511,7 @@ var Canvas = Renderer.extend({
 	_bringToFront: function (layer) {
 		var order = layer._order;
 
-		if (!order) {
-			return;
-		}
+		if (!order) { return; }
 
 		var next = order.next;
 		var prev = order.prev;
@@ -12796,9 +12542,7 @@ var Canvas = Renderer.extend({
 	_bringToBack: function (layer) {
 		var order = layer._order;
 
-		if (!order) {
-			return;
-		}
+		if (!order) { return; }
 
 		var next = order.next;
 		var prev = order.prev;
@@ -12868,9 +12612,7 @@ var vmlMixin = {
 	},
 
 	_update: function () {
-		if (this._map._animatingZoom) {
-			return;
-		}
+		if (this._map._animatingZoom) { return; }
 		Renderer.prototype._update.call(this);
 		this.fire('update');
 	},
@@ -12907,9 +12649,9 @@ var vmlMixin = {
 
 	_updateStyle: function (layer) {
 		var stroke = layer._stroke,
-			fill = layer._fill,
-			options = layer.options,
-			container = layer._container;
+		    fill = layer._fill,
+		    options = layer.options,
+		    container = layer._container;
 
 		container.stroked = !!options.stroke;
 		container.filled = !!options.fill;
@@ -12925,8 +12667,8 @@ var vmlMixin = {
 
 			if (options.dashArray) {
 				stroke.dashStyle = isArray(options.dashArray) ?
-					options.dashArray.join(' ') :
-					options.dashArray.replace(/( *, *)/g, ' ');
+				    options.dashArray.join(' ') :
+				    options.dashArray.replace(/( *, *)/g, ' ');
 			} else {
 				stroke.dashStyle = '';
 			}
@@ -12954,8 +12696,8 @@ var vmlMixin = {
 
 	_updateCircle: function (layer) {
 		var p = layer._point.round(),
-			r = Math.round(layer._radius),
-			r2 = Math.round(layer._radiusY || r);
+		    r = Math.round(layer._radius),
+		    r2 = Math.round(layer._radiusY || r);
 
 		this._setPath(layer, layer._empty() ? 'M0 0' :
 			'AL ' + p.x + ',' + p.y + ' ' + r + ',' + r2 + ' 0,' + (65535 * 360));
@@ -13046,15 +12788,13 @@ var SVG = Renderer.extend({
 	},
 
 	_update: function () {
-		if (this._map._animatingZoom && this._bounds) {
-			return;
-		}
+		if (this._map._animatingZoom && this._bounds) { return; }
 
 		Renderer.prototype._update.call(this);
 
 		var b = this._bounds,
-			size = b.getSize(),
-			container = this._container;
+		    size = b.getSize(),
+		    container = this._container;
 
 		// set size of svg-container if changed
 		if (!this._svgSize || !this._svgSize.equals(size)) {
@@ -13091,9 +12831,7 @@ var SVG = Renderer.extend({
 	},
 
 	_addPath: function (layer) {
-		if (!this._rootGroup) {
-			this._initContainer();
-		}
+		if (!this._rootGroup) { this._initContainer(); }
 		this._rootGroup.appendChild(layer._path);
 		layer.addInteractiveTarget(layer._path);
 	},
@@ -13111,11 +12849,9 @@ var SVG = Renderer.extend({
 
 	_updateStyle: function (layer) {
 		var path = layer._path,
-			options = layer.options;
+		    options = layer.options;
 
-		if (!path) {
-			return;
-		}
+		if (!path) { return; }
 
 		if (options.stroke) {
 			path.setAttribute('stroke', options.color);
@@ -13154,9 +12890,9 @@ var SVG = Renderer.extend({
 
 	_updateCircle: function (layer) {
 		var p = layer._point,
-			r = Math.max(Math.round(layer._radius), 1),
-			r2 = Math.max(Math.round(layer._radiusY), 1) || r,
-			arc = 'a' + r + ',' + r2 + ' 0 1,0 ';
+		    r = Math.max(Math.round(layer._radius), 1),
+		    r2 = Math.max(Math.round(layer._radiusY), 1) || r,
+		    arc = 'a' + r + ',' + r2 + ' 0 1,0 ';
 
 		// drawing a circle with two half-arcs
 		var d = layer._empty() ? 'M0 0' :
@@ -13353,9 +13089,7 @@ var BoxZoom = Handler.extend({
 	},
 
 	_onMouseDown: function (e) {
-		if (!e.shiftKey || ((e.which !== 1) && (e.button !== 1))) {
-			return false;
-		}
+		if (!e.shiftKey || ((e.which !== 1) && (e.button !== 1))) { return false; }
 
 		// Clear the deferred resetState if it hasn't executed yet, otherwise it
 		// will interrupt the interaction and orphan a box element in the container.
@@ -13388,11 +13122,11 @@ var BoxZoom = Handler.extend({
 		this._point = this._map.mouseEventToContainerPoint(e);
 
 		var bounds = new Bounds(this._point, this._startPoint),
-			size = bounds.getSize();
+		    size = bounds.getSize();
 
 		setPosition(this._box, bounds.min);
 
-		this._box.style.width = size.x + 'px';
+		this._box.style.width  = size.x + 'px';
 		this._box.style.height = size.y + 'px';
 	},
 
@@ -13414,23 +13148,19 @@ var BoxZoom = Handler.extend({
 	},
 
 	_onMouseUp: function (e) {
-		if ((e.which !== 1) && (e.button !== 1)) {
-			return;
-		}
+		if ((e.which !== 1) && (e.button !== 1)) { return; }
 
 		this._finish();
 
-		if (!this._moved) {
-			return;
-		}
+		if (!this._moved) { return; }
 		// Postpone to next JS tick so internal click event handling
 		// still see it as "moved".
 		this._clearDeferredResetState();
 		this._resetStateTimeout = setTimeout(bind(this._resetState, this), 0);
 
 		var bounds = new LatLngBounds(
-			this._map.containerPointToLatLng(this._startPoint),
-			this._map.containerPointToLatLng(this._point));
+		        this._map.containerPointToLatLng(this._startPoint),
+		        this._map.containerPointToLatLng(this._point));
 
 		this._map
 			.fitBounds(bounds)
@@ -13476,9 +13206,9 @@ var DoubleClickZoom = Handler.extend({
 
 	_onDoubleClick: function (e) {
 		var map = this._map,
-			oldZoom = map.getZoom(),
-			delta = map.options.zoomDelta,
-			zoom = e.originalEvent.shiftKey ? oldZoom - delta : oldZoom + delta;
+		    oldZoom = map.getZoom(),
+		    delta = map.options.zoomDelta,
+		    zoom = e.originalEvent.shiftKey ? oldZoom - delta : oldZoom + delta;
 
 		if (map.options.doubleClickZoom === 'center') {
 			map.setZoom(zoom);
@@ -13607,8 +13337,8 @@ var Drag = Handler.extend({
 		}
 
 		map
-			.fire('movestart')
-			.fire('dragstart');
+		    .fire('movestart')
+		    .fire('dragstart');
 
 		if (map.options.inertia) {
 			this._positions = [];
@@ -13619,7 +13349,7 @@ var Drag = Handler.extend({
 	_onDrag: function (e) {
 		if (this._map.options.inertia) {
 			var time = this._lastTime = +new Date(),
-				pos = this._lastPos = this._draggable._absPos || this._draggable._newPos;
+			    pos = this._lastPos = this._draggable._absPos || this._draggable._newPos;
 
 			this._positions.push(pos);
 			this._times.push(time);
@@ -13628,8 +13358,8 @@ var Drag = Handler.extend({
 		}
 
 		this._map
-			.fire('move', e)
-			.fire('drag', e);
+		    .fire('move', e)
+		    .fire('drag', e);
 	},
 
 	_prunePositions: function (time) {
@@ -13641,7 +13371,7 @@ var Drag = Handler.extend({
 
 	_onZoomEnd: function () {
 		var pxCenter = this._map.getSize().divideBy(2),
-			pxWorldCenter = this._map.latLngToLayerPoint([0, 0]);
+		    pxWorldCenter = this._map.latLngToLayerPoint([0, 0]);
 
 		this._initialWorldOffset = pxWorldCenter.subtract(pxCenter).x;
 		this._worldWidth = this._map.getPixelWorldBounds().getSize().x;
@@ -13652,25 +13382,15 @@ var Drag = Handler.extend({
 	},
 
 	_onPreDragLimit: function () {
-		if (!this._viscosity || !this._offsetLimit) {
-			return;
-		}
+		if (!this._viscosity || !this._offsetLimit) { return; }
 
 		var offset = this._draggable._newPos.subtract(this._draggable._startPos);
 
 		var limit = this._offsetLimit;
-		if (offset.x < limit.min.x) {
-			offset.x = this._viscousLimit(offset.x, limit.min.x);
-		}
-		if (offset.y < limit.min.y) {
-			offset.y = this._viscousLimit(offset.y, limit.min.y);
-		}
-		if (offset.x > limit.max.x) {
-			offset.x = this._viscousLimit(offset.x, limit.max.x);
-		}
-		if (offset.y > limit.max.y) {
-			offset.y = this._viscousLimit(offset.y, limit.max.y);
-		}
+		if (offset.x < limit.min.x) { offset.x = this._viscousLimit(offset.x, limit.min.x); }
+		if (offset.y < limit.min.y) { offset.y = this._viscousLimit(offset.y, limit.min.y); }
+		if (offset.x > limit.max.x) { offset.x = this._viscousLimit(offset.x, limit.max.x); }
+		if (offset.y > limit.max.y) { offset.y = this._viscousLimit(offset.y, limit.max.y); }
 
 		this._draggable._newPos = this._draggable._startPos.add(offset);
 	},
@@ -13678,12 +13398,12 @@ var Drag = Handler.extend({
 	_onPreDragWrap: function () {
 		// TODO refactor to be able to adjust map pane position after zoom
 		var worldWidth = this._worldWidth,
-			halfWidth = Math.round(worldWidth / 2),
-			dx = this._initialWorldOffset,
-			x = this._draggable._newPos.x,
-			newX1 = (x - halfWidth + dx) % worldWidth + halfWidth - dx,
-			newX2 = (x + halfWidth + dx) % worldWidth - halfWidth - dx,
-			newX = Math.abs(newX1 + dx) < Math.abs(newX2 + dx) ? newX1 : newX2;
+		    halfWidth = Math.round(worldWidth / 2),
+		    dx = this._initialWorldOffset,
+		    x = this._draggable._newPos.x,
+		    newX1 = (x - halfWidth + dx) % worldWidth + halfWidth - dx,
+		    newX2 = (x + halfWidth + dx) % worldWidth - halfWidth - dx,
+		    newX = Math.abs(newX1 + dx) < Math.abs(newX2 + dx) ? newX1 : newX2;
 
 		this._draggable._absPos = this._draggable._newPos.clone();
 		this._draggable._newPos.x = newX;
@@ -13691,9 +13411,9 @@ var Drag = Handler.extend({
 
 	_onDragEnd: function (e) {
 		var map = this._map,
-			options = map.options,
+		    options = map.options,
 
-			noInertia = !options.inertia || this._times.length < 2;
+		    noInertia = !options.inertia || this._times.length < 2;
 
 		map.fire('dragend', e);
 
@@ -13704,17 +13424,17 @@ var Drag = Handler.extend({
 			this._prunePositions(+new Date());
 
 			var direction = this._lastPos.subtract(this._positions[0]),
-				duration = (this._lastTime - this._times[0]) / 1000,
-				ease = options.easeLinearity,
+			    duration = (this._lastTime - this._times[0]) / 1000,
+			    ease = options.easeLinearity,
 
-				speedVector = direction.multiplyBy(ease / duration),
-				speed = speedVector.distanceTo([0, 0]),
+			    speedVector = direction.multiplyBy(ease / duration),
+			    speed = speedVector.distanceTo([0, 0]),
 
-				limitedSpeed = Math.min(options.inertiaMaxSpeed, speed),
-				limitedSpeedVector = speedVector.multiplyBy(limitedSpeed / speed),
+			    limitedSpeed = Math.min(options.inertiaMaxSpeed, speed),
+			    limitedSpeedVector = speedVector.multiplyBy(limitedSpeed / speed),
 
-				decelerationDuration = limitedSpeed / (options.inertiaDeceleration * ease),
-				offset = limitedSpeedVector.multiplyBy(-decelerationDuration / 2).round();
+			    decelerationDuration = limitedSpeed / (options.inertiaDeceleration * ease),
+			    offset = limitedSpeedVector.multiplyBy(-decelerationDuration / 2).round();
 
 			if (!offset.x && !offset.y) {
 				map.fire('moveend');
@@ -13760,11 +13480,11 @@ Map.mergeOptions({
 var Keyboard = Handler.extend({
 
 	keyCodes: {
-		left: [37],
-		right: [39],
-		down: [40],
-		up: [38],
-		zoomIn: [187, 107, 61, 171],
+		left:    [37],
+		right:   [39],
+		down:    [40],
+		up:      [38],
+		zoomIn:  [187, 107, 61, 171],
 		zoomOut: [189, 109, 54, 173]
 	},
 
@@ -13811,14 +13531,12 @@ var Keyboard = Handler.extend({
 	},
 
 	_onMouseDown: function () {
-		if (this._focused) {
-			return;
-		}
+		if (this._focused) { return; }
 
 		var body = document.body,
-			docEl = document.documentElement,
-			top = body.scrollTop || docEl.scrollTop,
-			left = body.scrollLeft || docEl.scrollLeft;
+		    docEl = document.documentElement,
+		    top = body.scrollTop || docEl.scrollTop,
+		    left = body.scrollLeft || docEl.scrollLeft;
 
 		this._map._container.focus();
 
@@ -13837,8 +13555,8 @@ var Keyboard = Handler.extend({
 
 	_setPanDelta: function (panDelta) {
 		var keys = this._panKeys = {},
-			codes = this.keyCodes,
-			i, len;
+		    codes = this.keyCodes,
+		    i, len;
 
 		for (i = 0, len = codes.left.length; i < len; i++) {
 			keys[codes.left[i]] = [-1 * panDelta, 0];
@@ -13856,8 +13574,8 @@ var Keyboard = Handler.extend({
 
 	_setZoomDelta: function (zoomDelta) {
 		var keys = this._zoomKeys = {},
-			codes = this.keyCodes,
-			i, len;
+		    codes = this.keyCodes,
+		    i, len;
 
 		for (i = 0, len = codes.zoomIn.length; i < len; i++) {
 			keys[codes.zoomIn[i]] = zoomDelta;
@@ -13876,13 +13594,11 @@ var Keyboard = Handler.extend({
 	},
 
 	_onKeyDown: function (e) {
-		if (e.altKey || e.ctrlKey || e.metaKey) {
-			return;
-		}
+		if (e.altKey || e.ctrlKey || e.metaKey) { return; }
 
 		var key = e.keyCode,
-			map = this._map,
-			offset;
+		    map = this._map,
+		    offset;
 
 		if (key in this._panKeys) {
 			if (!map._panAnim || !map._panAnim._inProgress) {
@@ -13975,23 +13691,21 @@ var ScrollWheelZoom = Handler.extend({
 
 	_performZoom: function () {
 		var map = this._map,
-			zoom = map.getZoom(),
-			snap = this._map.options.zoomSnap || 0;
+		    zoom = map.getZoom(),
+		    snap = this._map.options.zoomSnap || 0;
 
 		map._stop(); // stop panning and fly animations if any
 
 		// map the delta with a sigmoid function to -4..4 range leaning on -1..1
 		var d2 = this._delta / (this._map.options.wheelPxPerZoomLevel * 4),
-			d3 = 4 * Math.log(2 / (1 + Math.exp(-Math.abs(d2)))) / Math.LN2,
-			d4 = snap ? Math.ceil(d3 / snap) * snap : d3,
-			delta = map._limitZoom(zoom + (this._delta > 0 ? d4 : -d4)) - zoom;
+		    d3 = 4 * Math.log(2 / (1 + Math.exp(-Math.abs(d2)))) / Math.LN2,
+		    d4 = snap ? Math.ceil(d3 / snap) * snap : d3,
+		    delta = map._limitZoom(zoom + (this._delta > 0 ? d4 : -d4)) - zoom;
 
 		this._delta = 0;
 		this._startTime = null;
 
-		if (!delta) {
-			return;
-		}
+		if (!delta) { return; }
 
 		if (map.options.scrollWheelZoom === 'center') {
 			map.setZoom(zoom + delta);
@@ -14035,9 +13749,7 @@ var Tap = Handler.extend({
 	},
 
 	_onDown: function (e) {
-		if (!e.touches) {
-			return;
-		}
+		if (!e.touches) { return; }
 
 		preventDefault(e);
 
@@ -14051,7 +13763,7 @@ var Tap = Handler.extend({
 		}
 
 		var first = e.touches[0],
-			el = first.target;
+		    el = first.target;
 
 		this._startPos = this._newPos = new Point(first.clientX, first.clientY);
 
@@ -14088,7 +13800,7 @@ var Tap = Handler.extend({
 		if (this._fireClick && e && e.changedTouches) {
 
 			var first = e.changedTouches[0],
-				el = first.target;
+			    el = first.target;
 
 			if (el && el.tagName && el.tagName.toLowerCase() === 'a') {
 				removeClass(el, 'leaflet-active');
@@ -14120,10 +13832,10 @@ var Tap = Handler.extend({
 		e.target._simulatedClick = true;
 
 		simulatedEvent.initMouseEvent(
-			type, true, true, window, 1,
-			e.screenX, e.screenY,
-			e.clientX, e.clientY,
-			false, false, false, false, 0, null);
+		        type, true, true, window, 1,
+		        e.screenX, e.screenY,
+		        e.clientX, e.clientY,
+		        false, false, false, false, 0, null);
 
 		e.target.dispatchEvent(simulatedEvent);
 	}
@@ -14170,12 +13882,10 @@ var TouchZoom = Handler.extend({
 
 	_onTouchStart: function (e) {
 		var map = this._map;
-		if (!e.touches || e.touches.length !== 2 || map._animatingZoom || this._zooming) {
-			return;
-		}
+		if (!e.touches || e.touches.length !== 2 || map._animatingZoom || this._zooming) { return; }
 
 		var p1 = map.mouseEventToContainerPoint(e.touches[0]),
-			p2 = map.mouseEventToContainerPoint(e.touches[1]);
+		    p2 = map.mouseEventToContainerPoint(e.touches[1]);
 
 		this._centerPoint = map.getSize()._divideBy(2);
 		this._startLatLng = map.containerPointToLatLng(this._centerPoint);
@@ -14198,14 +13908,12 @@ var TouchZoom = Handler.extend({
 	},
 
 	_onTouchMove: function (e) {
-		if (!e.touches || e.touches.length !== 2 || !this._zooming) {
-			return;
-		}
+		if (!e.touches || e.touches.length !== 2 || !this._zooming) { return; }
 
 		var map = this._map,
-			p1 = map.mouseEventToContainerPoint(e.touches[0]),
-			p2 = map.mouseEventToContainerPoint(e.touches[1]),
-			scale = p1.distanceTo(p2) / this._startDist;
+		    p1 = map.mouseEventToContainerPoint(e.touches[0]),
+		    p2 = map.mouseEventToContainerPoint(e.touches[1]),
+		    scale = p1.distanceTo(p2) / this._startDist;
 
 		this._zoom = map.getScaleZoom(scale, this._startZoom);
 
@@ -14217,15 +13925,11 @@ var TouchZoom = Handler.extend({
 
 		if (map.options.touchZoom === 'center') {
 			this._center = this._startLatLng;
-			if (scale === 1) {
-				return;
-			}
+			if (scale === 1) { return; }
 		} else {
 			// Get delta from pinch to center, so centerLatLng is delta applied to initial pinchLatLng
 			var delta = p1._add(p2)._divideBy(2)._subtract(this._centerPoint);
-			if (scale === 1 && delta.x === 0 && delta.y === 0) {
-				return;
-			}
+			if (scale === 1 && delta.x === 0 && delta.y === 0) { return; }
 			this._center = map.unproject(map.project(this._pinchStartLatLng, this._zoom).subtract(delta), this._zoom);
 		}
 
@@ -14278,84 +13982,5 @@ Map.TouchZoom = TouchZoom;
 
 Object.freeze = freeze;
 
-export {
-	version,
-	Control,
-	control,
-	Browser,
-	Evented,
-	Mixin,
-	Util,
-	Class,
-	Handler,
-	extend,
-	bind,
-	stamp,
-	setOptions,
-	DomEvent,
-	DomUtil,
-	PosAnimation,
-	Draggable,
-	LineUtil,
-	PolyUtil,
-	Point,
-	toPoint as point,
-	Bounds,
-	toBounds as bounds,
-	Transformation,
-	toTransformation as transformation,
-	index as Projection,
-	LatLng,
-	toLatLng as latLng,
-	LatLngBounds,
-	toLatLngBounds as latLngBounds,
-	CRS,
-	GeoJSON,
-	geoJSON,
-	geoJson,
-	Layer,
-	LayerGroup,
-	layerGroup,
-	FeatureGroup,
-	featureGroup,
-	ImageOverlay,
-	imageOverlay,
-	VideoOverlay,
-	videoOverlay,
-	SVGOverlay,
-	svgOverlay,
-	DivOverlay,
-	Popup,
-	popup,
-	Tooltip,
-	tooltip,
-	Icon,
-	icon,
-	DivIcon,
-	divIcon,
-	Marker,
-	marker,
-	TileLayer,
-	tileLayer,
-	GridLayer,
-	gridLayer,
-	SVG,
-	svg$1 as svg,
-	Renderer,
-	Canvas,
-	canvas$1 as canvas,
-	Path,
-	CircleMarker,
-	circleMarker,
-	Circle,
-	circle,
-	Polyline,
-	polyline,
-	Polygon,
-	polygon,
-	Rectangle,
-	rectangle,
-	Map,
-	createMap as map
-};
+export { version, Control, control, Browser, Evented, Mixin, Util, Class, Handler, extend, bind, stamp, setOptions, DomEvent, DomUtil, PosAnimation, Draggable, LineUtil, PolyUtil, Point, toPoint as point, Bounds, toBounds as bounds, Transformation, toTransformation as transformation, index as Projection, LatLng, toLatLng as latLng, LatLngBounds, toLatLngBounds as latLngBounds, CRS, GeoJSON, geoJSON, geoJson, Layer, LayerGroup, layerGroup, FeatureGroup, featureGroup, ImageOverlay, imageOverlay, VideoOverlay, videoOverlay, SVGOverlay, svgOverlay, DivOverlay, Popup, popup, Tooltip, tooltip, Icon, icon, DivIcon, divIcon, Marker, marker, TileLayer, tileLayer, GridLayer, gridLayer, SVG, svg$1 as svg, Renderer, Canvas, canvas$1 as canvas, Path, CircleMarker, circleMarker, Circle, circle, Polyline, polyline, Polygon, polygon, Rectangle, rectangle, Map, createMap as map };
 //# sourceMappingURL=leaflet-src.esm.js.map

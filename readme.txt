@@ -4,7 +4,7 @@ Tags: openstreetmap, embed, gdpr
 Donate link: https://www.moewe.io/
 Requires at least: 5.1
 Tested up to: 5.4
-Stable tag: 2.0.0
+Stable tag: 2.0.1
 License: GPL v3
 License URI: http://www.gnu.org/copyleft/gpl.html
 
@@ -45,6 +45,10 @@ Nothing special
 
 == Changelog ==
 
+= 2.0.1 =
+
+* Fixed wrong redirect to placeholder on every 404
+
 = 2.0.0 =
 
 * Updated Leaflet.js to 1.6.0
@@ -71,3 +75,4 @@ Nothing special
 = 1.0.0 =
 
 * First release
+

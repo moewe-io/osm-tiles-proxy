@@ -22,7 +22,7 @@ window.addEventListener('load', event => {
                     coords.style.transform = tileEvent.tile.style.transform;
                     coords.style.padding = '5px';
                     coords.style.border = '1px solid red';
-                    coords.style.visibility = 'visible';
+                    coords.style.visibility= 'visible';
                     tileEvent.tile.style.border = '1px solid red';
                     tileEvent.tile.parentNode.append(coords);
                 });
