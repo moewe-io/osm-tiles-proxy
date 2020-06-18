@@ -2,9 +2,10 @@
 Contributors: adrian2k7,moewe, creabrain
 Tags: openstreetmap, embed, gdpr
 Donate link: https://www.moewe.io/
-Requires at least: 5.1
+Requires at least: 5.2
+Requires PHP: 7.2
 Tested up to: 5.4
-Stable tag: 2.0.1
+Stable tag: 2.1.0
 License: GPL v3
 License URI: http://www.gnu.org/copyleft/gpl.html
 
@@ -27,6 +28,24 @@ Tiles Proxy for OpenStreetMap provides a basic proxy, which allows other OpenStr
 * Might be slower than official servers (depends on your server)
 * First requests might be slow as map tiles are cached on request
 
+**Filters**
+
+You can use filters to get the URLs from the plugin:
+
+`
+  $proxy_cached_url   = apply_filter( 'osm_tiles_proxy_get_proxy_url', false );
+  $proxy_rest_api_url = apply_filter( 'osm_tiles_proxy_get_proxy_rest_url', false );
+  $leadlet_js_url     = apply_filter( 'osm_tiles_proxy_get_leaflet_js_url', false);
+  $leadlet_css_url    = apply_filter( 'osm_tiles_proxy_get_leaflet_css_url', false);
+`
+**Constants**
+
+To disable cache invalidation when WP Rocket or WP Fastest Cache invalidate their cache, you can set the following constant in your `wp-config.php`
+`
+define( 'OSM_PROXY_DISABLE_CLEAR_CACHE', true );
+`
+
+
 == Frequently Asked Questions ==
 
 = Does this work with every plugin? =
@@ -44,6 +63,11 @@ Nothing special
 3. Customizer overview
 
 == Changelog ==
+
+= 2.1.0 =
+
+* Added filters to get URLs for Leaflet and Proxy #5
+* Added constant `OSM_PROXY_DISABLE_CLEAR_CACHE` to disable cache invalidation (for WP Rocket and WP Fastest Cache)
 
 = 2.0.1 =
 

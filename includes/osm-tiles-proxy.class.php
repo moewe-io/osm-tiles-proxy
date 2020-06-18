@@ -24,6 +24,13 @@ class Proxy {
         add_action( 'wpfc_delete_cache', [ $this, 'clear_cache' ] );
         add_action( 'after_rocket_clean_domain', [ $this, 'clear_cache' ] );
 
+        add_filter( 'osm_tiles_proxy_get_proxy_url', [ $this, 'get_proxy_url_cached' ], 10, 1 );
+        add_filter( 'osm_tiles_proxy_get_proxy_rest_url', [ $this, 'get_proxy_url_rest_api' ], 10, 1 );
+        add_filter( 'osm_tiles_proxy_get_leaflet_js_url', [ $this, 'get_leaflet_js_url' ], 10, 1 );
+        add_filter( 'osm_tiles_proxy_get_leaflet_css_url', [ $this, 'get_leaflet_css_url' ], 10, 1 );
+
+        add_filter( 'osm_tiles_proxy_disable_clear_cache', [ $this, 'is_clear_cache_disabled' ], 10, 1 );
+
         if ( is_admin() ) {
             add_filter( 'plugin_row_meta', array( $this, 'init_row_meta' ), 11, 2 );
         }
@@ -120,6 +127,28 @@ class Proxy {
         return $remote_url;
     }
 
+    function get_proxy_url_cached( $url = false ) {
+        if ( $this->cache_enabled ) {
+            return content_url( '/cache/osm-tiles/{s}/{z}/{x}/{y}.png' );
+        }
+        return $url;
+    }
+
+    function get_proxy_url_rest_api( $url = false ) {
+        if ( $this->rest_api_enabled ) {
+            return rest_url( 'osm-tiles-proxy/v1/tiles/{s}/{z}/{x}/{y}.png' );
+        }
+        return $url;
+    }
+
+    function get_leaflet_js_url( $url ) {
+        return OSM_PROXY_BASE_URL . "/libs/leaflet/leaflet.js";
+    }
+
+    function get_leaflet_css_url( $url ) {
+        return OSM_PROXY_BASE_URL . "/libs/leaflet/leaflet.css";
+    }
+
     /**
      * Add additional useful links.
      *
@@ -133,7 +162,6 @@ class Proxy {
             return $links;
         }
         ob_start();
-        $leaflet_base_url = plugins_url( '/libs/leaflet/leaflet', $file );
         ?>
         <section class="notice notice-info" style="display: block;padding: 10px; margin-top: 5px;">
             <strong><?php _e( 'Usage', 'osm-tiles-proxy' ) ?></strong>
@@ -141,28 +169,27 @@ class Proxy {
                 <?php _e( 'Configure your OSM plugin to use the following urls instead.', 'osm-tiles-proxy' ) ?>
             </p>
             <table>
-                <?php if ( $this->cache_enabled ) {
-                    $osm_tiles_url = content_url( '/cache/osm-tiles/{s}/{z}/{x}/{y}.png' ); ?>
+                <?php if ( $this->cache_enabled ) { ?>
                     <tr>
                         <th><?php _e( 'Tiles url (Caching)', 'osm-tiles-proxy' ) ?></th>
-                        <td><?php echo $osm_tiles_url ?></td>
+                        <td><?php echo apply_filters( 'osm_tiles_proxy_get_proxy_url', '' ) ?></td>
                     </tr>
                 <?php } ?>
                 <?php if ( $this->rest_api_enabled ) {
-                    $osm_tiles_url = rest_url( 'osm-tiles-proxy/v1/tiles/{s}/{z}/{x}/{y}.png' ); ?>
+                    ?>
                     <tr>
                         <th><?php _e( 'Tiles url (REST API)', 'osm-tiles-proxy' ) ?></th>
-                        <td><?php echo $osm_tiles_url ?></td>
+                        <td><?php echo apply_filters( 'osm_tiles_proxy_get_proxy_rest_url', '' ) ?></td>
                     </tr>
                 <?php } ?>
 
                 <tr>
                     <th><?php _e( 'Leaflet JS', 'osm-tiles-proxy' ) ?></th>
-                    <td><?php echo $leaflet_base_url; ?>.js</td>
+                    <td><?php echo apply_filters( 'osm_tiles_proxy_get_leaflet_js_url', '' ) ?></td>
                 </tr>
                 <tr>
                     <th><?php _e( 'Leaflet CSS', 'osm-tiles-proxy' ) ?></th>
-                    <td><?php echo $leaflet_base_url; ?>.css</td>
+                    <td><?php echo apply_filters( 'osm_tiles_proxy_get_leaflet_css_url', '' ) ?></td>
                 </tr>
             </table>
         </section>
@@ -172,8 +199,15 @@ class Proxy {
         return $links;
     }
 
+    function is_clear_cache_disabled( $disabled = false ) {
+        return $disabled || defined( 'OSM_PROXY_DISABLE_CLEAR_CACHE' ) && OSM_PROXY_DISABLE_CLEAR_CACHE;
+    }
+
     function clear_cache() {
-        if ( apply_filters( 'osm-tiles-proxy/disable_clear_cache', false ) ) {
+        // @Deprecated: This filter is deprecated
+        $disable_clear_cache = apply_filters( 'osm-tiles-proxy/disable_clear_cache', false );
+
+        if ( apply_filters( 'osm_tiles_proxy_disable_clear_cache', $disable_clear_cache ) ) {
             return;
         }
         $this->rrmdir( WP_CONTENT_DIR . '/cache/osm-tiles' );
