@@ -33,10 +33,10 @@ Tiles Proxy for OpenStreetMap provides a basic proxy, which allows other OpenStr
 You can use filters to get the URLs from the plugin:
 
 `
-  $proxy_cached_url   = apply_filter( 'osm_tiles_proxy_get_proxy_url', false );
-  $proxy_rest_api_url = apply_filter( 'osm_tiles_proxy_get_proxy_rest_url', false );
-  $leadlet_js_url     = apply_filter( 'osm_tiles_proxy_get_leaflet_js_url', false);
-  $leadlet_css_url    = apply_filter( 'osm_tiles_proxy_get_leaflet_css_url', false);
+  $proxy_cached_url   = apply_filters( 'osm_tiles_proxy_get_proxy_url', $proxy_cached_url );
+  $proxy_rest_api_url = apply_filters( 'osm_tiles_proxy_get_proxy_rest_url', $proxy_rest_api_url );
+  $leadlet_js_url     = apply_filters( 'osm_tiles_proxy_get_leaflet_js_url', $leadlet_js_url );
+  $leadlet_css_url    = apply_filters( 'osm_tiles_proxy_get_leaflet_css_url', $leadlet_css_url );
 `
 **Constants**
 
