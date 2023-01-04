@@ -2,10 +2,10 @@
 Contributors: adrian2k7,moewe, creabrain
 Tags: openstreetmap, embed, gdpr
 Donate link: https://www.moewe.io/
-Requires at least: 5.2
-Requires PHP: 7.2
-Tested up to: 5.4
-Stable tag: 2.1.0
+Requires at least: 6.0
+Requires PHP: 7.3
+Tested up to: 6.1
+Stable tag: 2.2.0
 License: GPL v3
 License URI: http://www.gnu.org/copyleft/gpl.html
 
@@ -64,6 +64,13 @@ Nothing special
 3. Customizer overview
 
 == Changelog ==
+
+= 2.2.0 =
+
+* Updated to latest Leaflet.js (1.9.3)
+  * **Note:** This might be incompatible, if you are still using 1.8.x
+* Registered Leaflet JS and CSS, so it can be enqueued using `wp_enqueue_style('leaflet-js')` and `wp_enqueue_script('leaflet-js')`
+* Fixed js/css urls shown in administration
 
 = 2.1.0 =
 
