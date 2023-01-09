@@ -5,7 +5,7 @@ Donate link: https://www.moewe.io/
 Requires at least: 6.0
 Requires PHP: 7.3
 Tested up to: 6.1
-Stable tag: 2.2.0
+Stable tag: 2.3.0
 License: GPL v3
 License URI: http://www.gnu.org/copyleft/gpl.html
 
@@ -46,7 +46,6 @@ To disable cache invalidation when WP Rocket or WP Fastest Cache invalidate thei
 define( 'OSM_PROXY_DISABLE_CLEAR_CACHE', true );
 `
 
-
 == Frequently Asked Questions ==
 
 = Does this work with every plugin? =
@@ -64,6 +63,14 @@ Nothing special
 3. Customizer overview
 
 == Changelog ==
+
+= 2.3.0 =
+
+* The plugin will now automagically overwrite **default** settings for [Leaflet Map](https://de.wordpress.org/plugins/leaflet-map/).
+
+= 2.2.1 =
+
+* Added missing files to SVN, don't know why there are missing... Why can't they just support git, like everyone else?
 
 = 2.2.0 =
 
