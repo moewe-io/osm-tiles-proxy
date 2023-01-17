@@ -21,6 +21,7 @@ Tiles Proxy for OpenStreetMap provides a basic proxy, which allows other OpenStr
 
 * [Leaflet Map](https://de.wordpress.org/plugins/leaflet-map/)
 * [Custom Post Type to Map Store](https://wordpress.org/plugins/cpt-to-map-store/)
+* [Geolocation](https://wordpress.org/plugins/geolocation/)
 * Another plugin? Let us [know](https://wordpress.org/support/plugin/osm-tiles-proxy).
 
 **Notes**
