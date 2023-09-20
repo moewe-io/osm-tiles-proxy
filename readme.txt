@@ -1,11 +1,11 @@
 === Tiles Proxy for OpenStreetMap ===
 Contributors: adrian2k7,moewe, creabrain
-Tags: openstreetmap, embed, gdpr
-Donate link: https://www.moewe.io/
+Tags: openstreetmap, embed, gdpr, proxy
+Donate link: https://www.paypal.com/paypalme/scrobbleme
 Requires at least: 6.0
 Requires PHP: 7.3
 Tested up to: 6.1
-Stable tag: 2.3.0
+Stable tag: 2.3.1
 License: GPL v3
 License URI: http://www.gnu.org/copyleft/gpl.html
 
@@ -15,13 +15,15 @@ Tiles Proxy for OpenStreetMap provides a basic proxy, which allows other OpenStr
 
 Tiles Proxy for OpenStreetMap provides a basic proxy, which allows other OpenStreetMap plugins to load map tiles from your server instead from OpenStreetMap servers.
 
+**Sponsor**: [sachsen.tours](https://sachsen.tours)
+
 **Contribute**: [https://github.com/moewe-io/osm-tiles-proxy](https://github.com/moewe-io/osm-tiles-proxy)
 
 **Known to work with these plugins**
 
 * [Leaflet Map](https://de.wordpress.org/plugins/leaflet-map/)
 * [Custom Post Type to Map Store](https://wordpress.org/plugins/cpt-to-map-store/)
-* [Geolocation](https://wordpress.org/plugins/geolocation/advanced/)
+* [Geolocation](https://wordpress.org/plugins/geolocation/)
 * Another plugin? Let us [know](https://wordpress.org/support/plugin/osm-tiles-proxy).
 
 **Notes**
@@ -64,6 +66,10 @@ Nothing special
 3. Customizer overview
 
 == Changelog ==
+
+= 2.3.1 =
+
+* Updated to latest Leaflet.js (1.9.4)
 
 = 2.3.0 =
 
