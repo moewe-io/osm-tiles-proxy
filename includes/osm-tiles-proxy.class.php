@@ -47,6 +47,7 @@ class Proxy
         register_rest_route('osm-tiles-proxy/v1', '/tiles/(?P<s>\w+)/(?P<z>\d+)/(?P<x>\d+)/(?P<y>\d+).png', array(
             'methods' => 'GET',
             'callback' => [$this, 'get_osm_tile'],
+            'permission_callback' => '__return_true'
         ));
     }
 

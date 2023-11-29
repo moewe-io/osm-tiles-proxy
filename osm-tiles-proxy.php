@@ -3,7 +3,7 @@
  * Plugin Name: Tiles Proxy for OpenStreetMap
  * Plugin URI: https://wordpress.org/plugins/osm-tiles-proxy
  * Description: Helper plugin for embedding OpenStreetMaps
- * Version: 2.3.1
+ * Version: 2.3.2
  * Requires at least: 6.0
  * Requires PHP: 7.3
  * Author: MOEWE

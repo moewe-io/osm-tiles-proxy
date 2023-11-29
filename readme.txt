@@ -4,8 +4,8 @@ Tags: openstreetmap, embed, gdpr, proxy
 Donate link: https://www.paypal.com/paypalme/scrobbleme
 Requires at least: 6.0
 Requires PHP: 7.3
-Tested up to: 6.1
-Stable tag: 2.3.1
+Tested up to: 6.4
+Stable tag: 2.3.2
 License: GPL v3
 License URI: http://www.gnu.org/copyleft/gpl.html
 
@@ -66,6 +66,10 @@ Nothing special
 3. Customizer overview
 
 == Changelog ==
+
+= 2.3.2 =
+
+* Fixed warning for registering REST route
 
 = 2.3.1 =
 
