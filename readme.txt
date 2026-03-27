@@ -9,7 +9,7 @@ Stable tag: 2.4.0
 License: GPL v3
 License URI: http://www.gnu.org/copyleft/gpl.html
 
-Tiles Proxy for OpenStreetMap provides a basic proxy, which allows other OpenStreetMap plugins to load map tiles from your server instead from OpenStreetMap servers.
+A basic proxy that lets OpenStreetMap plugins load map tiles from your own server instead of OpenStreetMap servers.
 
 == Description ==
 
