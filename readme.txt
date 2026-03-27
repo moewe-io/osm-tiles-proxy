@@ -69,6 +69,7 @@ Nothing special
 
 = 2.4.0 (2026-03-27) =
 
+* #3 Add option to clear cache
 * #10 Add option to customize osm-tiles-proxy-osm-url
 * Downloaded tiles will be cleared when the cache is cleared in [WP Speed of Light](https://www.joomunited.com/wordpress-products/wp-speed-of-light)
 * Require PHP 8.0, we urge everyone to keep PHP updated
