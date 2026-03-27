@@ -2,29 +2,27 @@
 
 namespace MOEWE\OSM_Tiles_proxy;
 
+use WP_Error;
 use WP_REST_Request;
 
 class Proxy
 {
 
-    private $cache_404_pattern = '/\/cache\/osm-tiles\/(?P<s>\w+)\/(?P<z>\d+)\/(?P<x>\d+)\/(?P<y>\d+).png/m';
+    private string $cache_404_pattern = '/\/cache\/osm-tiles\/(?P<s>\w+)\/(?P<z>\d+)\/(?P<x>\d+)\/(?P<y>\d+).png/m';
 
-    private $cache_enabled;
-    private $rest_api_enabled;
-    private $osm_url;
+    private bool $cache_enabled;
+    private bool $rest_api_enabled;
+    private string $osm_url;
 
     function __construct()
     {
-
         $this->rest_api_enabled = get_option('osm-tiles-proxy-rest-api-enabled', false);
         $this->cache_enabled = get_option('osm-tiles-proxy-cache-enabled', true);
-        $this->osm_url = get_option('osm-tiles-proxy-osm-url', 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png');
+        $this->osm_url = get_option('osm-tiles-proxy-osm-url', OSM_PROXY_DEFAULT_TILE_SERVER_URL);
+        $this->osm_url = empty($this->osm_url) ? OSM_PROXY_DEFAULT_TILE_SERVER_URL : $this->osm_url;
 
         add_action('rest_api_init', array($this, 'add_osm_proxy'));
         add_action('template_redirect', array($this, 'cache_on_404'), 0);
-
-        add_action('wpfc_delete_cache', [$this, 'clear_cache']);
-        add_action('after_rocket_clean_domain', [$this, 'clear_cache']);
 
         add_filter('osm_tiles_proxy_get_proxy_url', [$this, 'get_proxy_url_cached'], 10, 1);
         add_filter('osm_tiles_proxy_get_proxy_rest_url', [$this, 'get_proxy_url_rest_api'], 10, 1);
@@ -36,33 +34,44 @@ class Proxy
         if (is_admin()) {
             add_filter('plugin_row_meta', array($this, 'init_row_meta'), 11, 2);
         }
+
+        // Add clear cache for caching plugins
+        add_action('wpfc_delete_cache', [$this, 'clear_cache']);
+        add_action('after_rocket_clean_domain', [$this, 'clear_cache']);
+        add_action('wpsol_purge_cache', [$this, 'clear_cache']);
     }
 
 
-    function add_osm_proxy()
+    function add_osm_proxy(): void
     {
-        if (!$this->rest_api_enabled) {
-            return;
+        register_rest_route('osm-tiles-proxy/v1', '/tiles/', [
+                'methods' => 'DELETE',
+                'callback' => [$this, 'clear_cache'],
+                'permission_callback' => fn($request) => current_user_can('manage_options') ? true
+                        : new WP_Error('rest_forbidden', esc_html__('You are not allowed to clear the cache.', 'osm-tiles-proxy'), ['status' => 401])
+        ]);
+
+        if ($this->rest_api_enabled) {
+            register_rest_route('osm-tiles-proxy/v1', '/tiles/(?P<s>\w+)/(?P<z>\d+)/(?P<x>\d+)/(?P<y>\d+).png', array(
+                    'methods' => 'GET',
+                    'callback' => [$this, 'get_osm_tile'],
+                    'permission_callback' => '__return_true'
+            ));
         }
-        register_rest_route('osm-tiles-proxy/v1', '/tiles/(?P<s>\w+)/(?P<z>\d+)/(?P<x>\d+)/(?P<y>\d+).png', array(
-            'methods' => 'GET',
-            'callback' => [$this, 'get_osm_tile'],
-            'permission_callback' => '__return_true'
-        ));
     }
 
-    function cache_on_404()
+    function cache_on_404(): void
     {
         if (!$this->cache_enabled || !is_404()) {
             return;
         }
         global $wp;
 
-        $out_of_range_url = get_option('osm_tiles_proxy_out_of_range_image_url', OSM_PROXY_BASE_URL . 'assets/out_of_range.png');
-
         if (!preg_match_all($this->cache_404_pattern, $wp->request, $matches, PREG_SET_ORDER, 0)) {
             return;
         }
+
+        $out_of_range_url = get_option('osm_tiles_proxy_out_of_range_image_url', OSM_PROXY_BASE_URL . 'assets/out_of_range.png');
 
         $min_zoom = get_option('osm_tiles_proxy_min_zoom', 0);
         $max_zoom = get_option('osm_tiles_proxy_max_zoom', 20);
@@ -102,10 +111,17 @@ class Proxy
         $download_target = $download_target . '/' . $y . '.png';
 
         wp_remote_get($download_url, array(
-            'timeout' => 300,
-            'stream' => true,
-            'filename' => $download_target
+                'timeout' => 300,
+                'stream' => true,
+                'filename' => $download_target
         ));
+
+        if (!wp_filesize($download_target)) {
+            wp_delete_file($download_target);
+            $error_image = get_option('osm_tiles_proxy_download_error_image_url', OSM_PROXY_BASE_URL . 'assets/download_error.png');
+            wp_redirect($error_image, 307);
+            die;
+        }
 
         wp_redirect(add_query_arg('retry', '1', home_url($wp->request)));
         die;
@@ -150,12 +166,12 @@ class Proxy
         return $url;
     }
 
-    function get_leaflet_js_url($url)
+    function get_leaflet_js_url($url): string
     {
         return OSM_PROXY_BASE_URL . "libs/leaflet/leaflet.js";
     }
 
-    function get_leaflet_css_url($url)
+    function get_leaflet_css_url($url): string
     {
         return OSM_PROXY_BASE_URL . "libs/leaflet/leaflet.css";
     }
@@ -168,9 +184,9 @@ class Proxy
      *
      * @return array Links including new ones.
      */
-    function init_row_meta($links, $file)
+    function init_row_meta($links, $file): array
     {
-        if (strpos($file, 'osm-tiles-proxy.php') === false) {
+        if (!str_contains($file, 'osm-tiles-proxy.php')) {
             return $links;
         }
         ob_start();
@@ -196,27 +212,58 @@ class Proxy
                 <?php } ?>
 
                 <tr>
-                    <th><?php _e('Leaflet JS', 'osm-tiles-proxy') ?></th>
-                    <td><?php echo apply_filters('osm_tiles_proxy_get_leaflet_js_url', '') ?></td>
+                    <th><?= __('Leaflet JS', 'osm-tiles-proxy') ?></th>
+                    <td><?= apply_filters('osm_tiles_proxy_get_leaflet_js_url', '') ?></td>
                 </tr>
                 <tr>
-                    <th><?php _e('Leaflet CSS', 'osm-tiles-proxy') ?></th>
-                    <td><?php echo apply_filters('osm_tiles_proxy_get_leaflet_css_url', '') ?></td>
+                    <th><?= __('Leaflet CSS', 'osm-tiles-proxy') ?></th>
+                    <td><?= apply_filters('osm_tiles_proxy_get_leaflet_css_url', '') ?></td>
+                </tr>
+                <tr>
+                    <th><?= __('Remote tiles server', 'osm-tiles-proxy') ?></th>
+                    <td><?= $this->osm_url ?></td>
+                </tr>
+                <tr>
+                    <th><?= __('Current cache size', 'osm-tiles-proxy') ?></th>
+                    <td style="display: flex; align-items: center; gap: 1ch;">
+                        <span class="osm-proxy-cache-size">
+                        <?= size_format(get_dirsize(WP_CONTENT_DIR . '/cache/osm-tiles')) ?: '0 MB' ?>
+                       </span>
+                        <button type="button" class="button action"
+                                onclick="osm_proxy_clear_cache()"><?= __('Clear cache', 'osm-tiles-proxy') ?>
+                        </button>
+                    </td>
                 </tr>
             </table>
+
+            <p>
+                <?= sprintf(__('Like the plugin? <a target="_blank" href="%s">Donate</a>.', 'osm-tiles-proxy'),
+                        OSM_PROXY_DONATION_URL) ?>
+            </p>
         </section>
+        <script>
+            function osm_proxy_clear_cache() {
+                wp.apiFetch({
+                    path: '/osm-tiles-proxy/v1/tiles',
+                    method: 'DELETE',
+                    parse: false
+                }).then((response) => {
+                    document.querySelector('.osm-proxy-cache-size').innerText = '0 MB';
+                });
+            }
+        </script>
         <?php
         $links[] = ob_get_clean();
 
         return $links;
     }
 
-    function is_clear_cache_disabled($disabled = false)
+    function is_clear_cache_disabled($disabled = false): bool
     {
         return $disabled || defined('OSM_PROXY_DISABLE_CLEAR_CACHE') && OSM_PROXY_DISABLE_CLEAR_CACHE;
     }
 
-    function clear_cache()
+    function clear_cache(): void
     {
         // @Deprecated: This filter is deprecated
         $disable_clear_cache = apply_filters('osm-tiles-proxy/disable_clear_cache', false);
@@ -225,11 +272,13 @@ class Proxy
             return;
         }
         $this->rrmdir(WP_CONTENT_DIR . '/cache/osm-tiles');
+        delete_transient('dirsize_cache');
     }
 
     // Thanks: https://stackoverflow.com/a/3338133/1165132
-    function rrmdir($directory)
+    function rrmdir($directory): void
     {
+
         if (!is_dir($directory)) {
             return;
         }

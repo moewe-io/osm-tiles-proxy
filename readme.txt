@@ -3,9 +3,9 @@ Contributors: adrian2k7,moewe, creabrain
 Tags: openstreetmap, embed, gdpr, proxy
 Donate link: https://www.paypal.com/paypalme/scrobbleme
 Requires at least: 6.0
-Requires PHP: 7.3
-Tested up to: 6.4
-Stable tag: 2.3.2
+Requires PHP: 8.0
+Tested up to: 7.0
+Stable tag: 2.4.0
 License: GPL v3
 License URI: http://www.gnu.org/copyleft/gpl.html
 
@@ -67,6 +67,14 @@ Nothing special
 
 == Changelog ==
 
+= 2.4.0 (2026-03-27) =
+
+* #10 Add option to customize osm-tiles-proxy-osm-url
+* Downloaded tiles will be cleared when the cache is cleared in [WP Speed of Light](https://www.joomunited.com/wordpress-products/wp-speed-of-light)
+* Require PHP 8.0, we urge everyone to keep PHP updated
+* Added deployment scripts for Github Actions
+* Fixed some warnings
+
 = 2.3.2 =
 
 * Fixed warning for registering REST route
@@ -97,15 +105,15 @@ Nothing special
 
 = 2.0.1 =
 
-* Fixed wrong redirect to placeholder on every 404
+* Fixed the wrong redirect to placeholder on every 404
 
 = 2.0.0 =
 
 * Updated Leaflet.js to 1.6.0
 * Added a new Customizer panel, which allows you to define some restrictions for downloaded tiles
-* Require PHP 7.2+, we urge everyone keep PHP updated and will stick to official end of security updates for PHP
-* Downloaded tiles will be cleared, when "entire cache" is cleared in WP Rocket
-* Downloaded tiles will be cleared, when cache is cleared in WP Fastest Cache
+* Require PHP 7.2+, we urge everyone to keep PHP updated and will stick to the official end of security updates for PHP
+* Downloaded tiles will be cleared when "entire cache" is cleared in WP Rocket
+* Downloaded tiles will be cleared when the cache is cleared in WP Fastest Cache
 
 = 1.3.0 =
 
