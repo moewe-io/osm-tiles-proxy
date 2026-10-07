@@ -78,6 +78,7 @@ Nothing special
 * Restrictions for zoom and area are now applied to the REST API as well
 * Added filter `osm_tiles_proxy_allowed_subdomains` (defaults to a, b and c for the default tiles server)
 * Fixed "Clear cache" button, if `wp-api-fetch` wasn't loaded by another plugin
+* Added button to update the shown cache size in the plugins overview
 * Options and cached tiles are removed on uninstall
 * Added WordPress Coding Standards checks (`composer lint`) and fixed missing output escaping
 

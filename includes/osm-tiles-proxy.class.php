@@ -56,6 +56,13 @@ class Proxy
                         : new WP_Error('rest_forbidden', esc_html__('You are not allowed to clear the cache.', 'osm-tiles-proxy'), ['status' => 401])
         ]);
 
+        register_rest_route('osm-tiles-proxy/v1', '/tiles/size', [
+                'methods' => 'GET',
+                'callback' => [$this, 'get_cache_size'],
+                'permission_callback' => fn($request) => current_user_can('manage_options') ? true
+                        : new WP_Error('rest_forbidden', esc_html__('You are not allowed to view the cache size.', 'osm-tiles-proxy'), ['status' => 401])
+        ]);
+
         if ($this->rest_api_enabled) {
             register_rest_route('osm-tiles-proxy/v1', '/tiles/(?P<s>[a-z0-9]{1,8})/(?P<z>\d{1,2})/(?P<x>\d{1,7})/(?P<y>\d{1,7})\.png', array(
                     'methods' => 'GET',
@@ -321,10 +328,13 @@ class Proxy
                     <th><?= esc_html__('Current cache size', 'osm-tiles-proxy') ?></th>
                     <td style="display: flex; align-items: center; gap: 1ch;">
                         <span class="osm-proxy-cache-size">
-                        <?= esc_html(size_format(get_dirsize(WP_CONTENT_DIR . '/cache/osm-tiles')) ?: '0 MB') ?>
+                        <?= esc_html($this->get_formatted_cache_size()) ?>
                        </span>
                         <button type="button" class="button action"
                                 onclick="osm_proxy_clear_cache()"><?= esc_html__('Clear cache', 'osm-tiles-proxy') ?>
+                        </button>
+                        <button type="button" class="button action"
+                                onclick="osm_proxy_update_size(this)"><?= esc_html__('Update Size', 'osm-tiles-proxy') ?>
                         </button>
                     </td>
                 </tr>
@@ -346,6 +356,17 @@ class Proxy
                     parse: false
                 }).then((response) => {
                     document.querySelector('.osm-proxy-cache-size').innerText = '0 MB';
+                });
+            }
+
+            function osm_proxy_update_size(button) {
+                button.disabled = true;
+                wp.apiFetch({
+                    path: '/osm-tiles-proxy/v1/tiles/size'
+                }).then((response) => {
+                    document.querySelector('.osm-proxy-cache-size').innerText = response.size;
+                }).finally(() => {
+                    button.disabled = false;
                 });
             }
         </script>
@@ -370,6 +391,19 @@ class Proxy
         }
         $this->rrmdir(WP_CONTENT_DIR . '/cache/osm-tiles');
         delete_transient('dirsize_cache');
+    }
+
+    function get_cache_size(): array
+    {
+        // Sizes are cached by WordPress, so drop them to get the current value
+        delete_transient('dirsize_cache');
+
+        return ['size' => $this->get_formatted_cache_size()];
+    }
+
+    function get_formatted_cache_size(): string
+    {
+        return size_format(get_dirsize(WP_CONTENT_DIR . '/cache/osm-tiles')) ?: '0 MB';
     }
 
     // Thanks: https://stackoverflow.com/a/3338133/1165132
