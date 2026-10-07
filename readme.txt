@@ -5,7 +5,7 @@ Donate link: https://www.paypal.com/paypalme/scrobbleme
 Requires at least: 6.0
 Requires PHP: 8.0
 Tested up to: 7.0
-Stable tag: 2.4.0
+Stable tag: 2.4.1
 License: GPL v3
 License URI: http://www.gnu.org/copyleft/gpl.html
 
@@ -67,7 +67,7 @@ Nothing special
 
 == Changelog ==
 
-= Unreleased =
+= 2.4.1 (2026-10-07) =
 
 * Fixed swapped URLs for the registered `leaflet-js` script and style
 * Fixed `OSM_PROXY_DISABLE_PLUGIN_LEAFMAP_MAP_INTEGRATION`, setting it to `true` now disables the integration
