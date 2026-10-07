@@ -17,7 +17,7 @@ class Customizer
     function customize_register(\WP_Customize_Manager $wp_customize): void
     {
 
-        $max_x_y = pow(2, absint(get_option('osm_tiles_proxy_max_zoom', 20))) - 1;
+        $max_x_y = Proxy::MAX_X_Y;
 
         $wp_customize->add_section('osm_tiles_proxy_section', array(
             'title' => __('OSM Tiles Proxy', 'osm-tiles-proxy'),
@@ -63,6 +63,7 @@ class Customizer
         $wp_customize->add_setting('osm-tiles-proxy-osm-url', array(
             'type' => 'option',
             'validate_callback' => [$this, 'validate_url_callback'],
+            'sanitize_callback' => 'sanitize_text_field',
             'default' => OSM_PROXY_DEFAULT_TILE_SERVER_URL
         ));
 
@@ -86,7 +87,7 @@ class Customizer
             'section' => 'osm_tiles_proxy_section',
             'settings' => 'osm_tiles_proxy_max_zoom',
             'type' => 'number',
-            'default' => 18,
+            'default' => 20,
             'input_attrs' => array(
                 'min' => 0,
                 'max' => 20,

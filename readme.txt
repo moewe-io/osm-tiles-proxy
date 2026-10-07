@@ -67,6 +67,20 @@ Nothing special
 
 == Changelog ==
 
+= Unreleased =
+
+* Fixed swapped URLs for the registered `leaflet-js` script and style
+* Fixed `OSM_PROXY_DISABLE_PLUGIN_LEAFMAP_MAP_INTEGRATION`, setting it to `true` now disables the integration
+* Fixed area restriction blocking most of the world, if max. zoom was set below 12
+* Tiles are only cached, if the tiles server returns an image with status 200
+* Fixed possible redirect loop, if the web server doesn't deliver cached tiles directly
+* Requests for non-existing tiles or subdomains are rejected before anything is downloaded or created
+* Restrictions for zoom and area are now applied to the REST API as well
+* Added filter `osm_tiles_proxy_allowed_subdomains` (defaults to a, b and c for the default tiles server)
+* Fixed "Clear cache" button, if `wp-api-fetch` wasn't loaded by another plugin
+* Options and cached tiles are removed on uninstall
+* Added WordPress Coding Standards checks (`composer lint`) and fixed missing output escaping
+
 = 2.4.0 (2026-03-27) =
 
 * #3 Add option to clear cache

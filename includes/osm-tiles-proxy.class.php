@@ -8,7 +8,11 @@ use WP_REST_Request;
 class Proxy
 {
 
-    private string $cache_404_pattern = '/\/cache\/osm-tiles\/(?P<s>\w+)\/(?P<z>\d+)\/(?P<x>\d+)\/(?P<y>\d+).png/m';
+    const MAX_ZOOM = 20;
+    // Area restrictions are stored as coordinates at zoom level 12
+    const MAX_X_Y = 4095;
+
+    private string $cache_404_pattern = '/\/cache\/osm-tiles\/(?P<s>[a-z0-9]{1,8})\/(?P<z>\d{1,2})\/(?P<x>\d{1,7})\/(?P<y>\d{1,7})\.png$/';
 
     private bool $cache_enabled;
     private bool $rest_api_enabled;
@@ -33,6 +37,7 @@ class Proxy
 
         if (is_admin()) {
             add_filter('plugin_row_meta', array($this, 'init_row_meta'), 11, 2);
+            add_action('admin_enqueue_scripts', array($this, 'enqueue_admin_scripts'));
         }
 
         // Add clear cache for caching plugins
@@ -52,7 +57,7 @@ class Proxy
         ]);
 
         if ($this->rest_api_enabled) {
-            register_rest_route('osm-tiles-proxy/v1', '/tiles/(?P<s>\w+)/(?P<z>\d+)/(?P<x>\d+)/(?P<y>\d+).png', array(
+            register_rest_route('osm-tiles-proxy/v1', '/tiles/(?P<s>[a-z0-9]{1,8})/(?P<z>\d{1,2})/(?P<x>\d{1,7})/(?P<y>\d{1,7})\.png', array(
                     'methods' => 'GET',
                     'callback' => [$this, 'get_osm_tile'],
                     'permission_callback' => '__return_true'
@@ -67,63 +72,35 @@ class Proxy
         }
         global $wp;
 
-        if (!preg_match_all($this->cache_404_pattern, $wp->request, $matches, PREG_SET_ORDER, 0)) {
+        if (!preg_match($this->cache_404_pattern, $wp->request, $matches)) {
             return;
         }
 
-        $out_of_range_url = get_option('osm_tiles_proxy_out_of_range_image_url', OSM_PROXY_BASE_URL . 'assets/out_of_range.png');
+        $s = $matches['s'];
+        $zoom = (int)$matches['z'];
+        $x = (int)$matches['x'];
+        $y = (int)$matches['y'];
 
-        $min_zoom = get_option('osm_tiles_proxy_min_zoom', 0);
-        $max_zoom = get_option('osm_tiles_proxy_max_zoom', 20);
-
-        $matches = $matches[0];
-        $zoom = max(0, min(20, $matches['z'])); // OSM is always 0 to 20
-        $x = $matches['x'];
-        $y = $matches['y'];
-
-        if ($zoom > $max_zoom || $zoom < $min_zoom) {
-            wp_redirect($out_of_range_url, 302);
-            die;
+        if (!$this->is_valid_subdomain($s) || !$this->is_tile_allowed($zoom, $x, $y)) {
+            $this->redirect_out_of_range();
         }
 
-        $max_x_y = pow(2, $max_zoom) - 1;
-        // Tiles will always be downloaded, if current zoom <= unrestricted zoom
-        $unrestricted_zoom = apply_filters('osm-tiles-proxy/get-unrestricted-zoom', 6);
+        $target = WP_CONTENT_DIR . '/cache/osm-tiles/' . $s . '/' . $zoom . '/' . $x . '/' . $y . '.png';
 
-        $min_x = floor($this->get_real_x_y(get_option('osm_tiles_proxy_min_x', 0), $zoom));
-        $max_x = ceil($this->get_real_x_y(get_option('osm_tiles_proxy_max_x', $max_x_y), $zoom));
-
-        $min_y = floor($this->get_real_x_y(get_option('osm_tiles_proxy_min_y', 0), $zoom));
-        $max_y = ceil($this->get_real_x_y(get_option('osm_tiles_proxy_max_y', $max_x_y), $zoom));
-
-
-        if ($zoom > $unrestricted_zoom && ($x > $max_x || $x < $min_x || $y > $max_y || $y < $min_y)) {
-            wp_redirect($out_of_range_url, 302);
-            die;
-        }
-
-        $base_path = WP_CONTENT_DIR . '/cache/osm-tiles';
-        $download_url = $this->get_osm_remote_url($matches['s'], $zoom, $x, $y);
-
-        $download_target = $base_path . '/' . $matches['s'] . '/' . $zoom . '/' . $x . '/';
-
-        wp_mkdir_p($download_target);
-        $download_target = $download_target . '/' . $y . '.png';
-
-        wp_remote_get($download_url, array(
-                'timeout' => 300,
-                'stream' => true,
-                'filename' => $download_target
-        ));
-
-        if (!wp_filesize($download_target)) {
-            wp_delete_file($download_target);
+        if (!is_file($target) && !$this->download_tile($s, $zoom, $x, $y, $target)) {
             $error_image = get_option('osm_tiles_proxy_download_error_image_url', OSM_PROXY_BASE_URL . 'assets/download_error.png');
+            // phpcs:ignore WordPress.Security.SafeRedirect.wp_redirect_wp_redirect -- The image might be hosted somewhere else.
             wp_redirect($error_image, 307);
             die;
         }
 
-        wp_redirect(add_query_arg('retry', '1', home_url($wp->request)));
+        // The tile exists, but the web server still passes the request to WordPress: Deliver it directly instead of redirecting again.
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Public flag without side effects.
+        if (isset($_GET['retry'])) {
+            $this->send_tile(file_get_contents($target), wp_get_image_mime($target) ?: 'image/png');
+        }
+
+        wp_safe_redirect(add_query_arg('retry', '1', home_url($wp->request)));
         die;
     }
 
@@ -132,11 +109,128 @@ class Proxy
      */
     function get_osm_tile($request)
     {
-        $remote_url = $this->get_osm_remote_url($request->get_param('s'), $request->get_param('z'), $request->get_param('x'), $request->get_param('y'));
-        header('Content-Description: File Transfer');
-        header('Content-Type: image/png');
+        $s = $request->get_param('s');
+        $zoom = (int)$request->get_param('z');
+        $x = (int)$request->get_param('x');
+        $y = (int)$request->get_param('y');
+
+        if (!$this->is_valid_subdomain($s) || !$this->is_tile_allowed($zoom, $x, $y)) {
+            $this->redirect_out_of_range();
+        }
+
+        $tile = $this->fetch_tile($s, $zoom, $x, $y);
+        if (!$tile) {
+            return new WP_Error('osm_tiles_proxy_download_error', esc_html__('The tile could not be downloaded.', 'osm-tiles-proxy'), ['status' => 502]);
+        }
+        $this->send_tile($tile['body'], $tile['content_type']);
+    }
+
+    function is_valid_subdomain(string $s): bool
+    {
+        // The default server only knows a, b and c. Custom servers may use anything matching the url pattern.
+        $allowed = OSM_PROXY_DEFAULT_TILE_SERVER_URL === $this->osm_url ? ['a', 'b', 'c'] : [];
+        $allowed = apply_filters('osm_tiles_proxy_allowed_subdomains', $allowed);
+
+        return empty($allowed) || in_array($s, $allowed, true);
+    }
+
+    function is_tile_allowed(int $zoom, int $x, int $y): bool
+    {
+        $min_zoom = (int)get_option('osm_tiles_proxy_min_zoom', 0);
+        $max_zoom = min(self::MAX_ZOOM, (int)get_option('osm_tiles_proxy_max_zoom', self::MAX_ZOOM));
+
+        if ($zoom > $max_zoom || $zoom < $min_zoom) {
+            return false;
+        }
+
+        $tiles_per_axis = pow(2, $zoom);
+        if ($x >= $tiles_per_axis || $y >= $tiles_per_axis) {
+            return false;
+        }
+
+        // Tiles will always be downloaded, if current zoom <= unrestricted zoom
+        $unrestricted_zoom = apply_filters('osm-tiles-proxy/get-unrestricted-zoom', 6);
+        if ($zoom <= $unrestricted_zoom) {
+            return true;
+        }
+
+        // A tile at zoom level 12 covers several tiles at higher zoom levels, so the max. values include the whole tile
+        $min_x = floor($this->get_real_x_y(get_option('osm_tiles_proxy_min_x', 0), $zoom));
+        $max_x = ceil($this->get_real_x_y((int)get_option('osm_tiles_proxy_max_x', self::MAX_X_Y) + 1, $zoom) - 1);
+
+        $min_y = floor($this->get_real_x_y(get_option('osm_tiles_proxy_min_y', 0), $zoom));
+        $max_y = ceil($this->get_real_x_y((int)get_option('osm_tiles_proxy_max_y', self::MAX_X_Y) + 1, $zoom) - 1);
+
+        return $x <= $max_x && $x >= $min_x && $y <= $max_y && $y >= $min_y;
+    }
+
+    /**
+     * @return array|null Body and content type of the tile or null, if the remote server didn't return an image.
+     */
+    function fetch_tile(string $s, int $zoom, int $x, int $y): ?array
+    {
+        $response = wp_remote_get($this->get_osm_remote_url($s, $zoom, $x, $y), array(
+                'timeout' => 10,
+                'limit_response_size' => 5 * MB_IN_BYTES
+        ));
+
+        if (is_wp_error($response) || 200 !== wp_remote_retrieve_response_code($response)) {
+            return null;
+        }
+
+        $body = wp_remote_retrieve_body($response);
+        $content_type = wp_remote_retrieve_header($response, 'content-type');
+
+        if ('' === $body || !is_string($content_type) || !str_starts_with($content_type, 'image/')) {
+            return null;
+        }
+
+        return ['body' => $body, 'content_type' => $content_type];
+    }
+
+    function download_tile(string $s, int $zoom, int $x, int $y, string $target): bool
+    {
+        $tile = $this->fetch_tile($s, $zoom, $x, $y);
+
+        if (!$tile || !wp_mkdir_p(dirname($target))) {
+            return false;
+        }
+
+        // Write to a temporary file first, so parallel requests never get a partial tile
+        $temp_file = $target . '.' . uniqid('', true) . '.tmp';
+
+        if (false === file_put_contents($temp_file, $tile['body']) || !rename($temp_file, $target)) {
+            wp_delete_file($temp_file);
+
+            return false;
+        }
+
+        return true;
+    }
+
+    function send_tile(string $body, string $content_type): void
+    {
+        status_header(200);
+        header('Content-Type: ' . $content_type);
+        header('Content-Length: ' . strlen($body));
         header('Cache-Control: public, max-age=604800'); // 1 week for no specific reason
-        readfile($remote_url);
+        // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Binary image data.
+        echo $body;
+        die;
+    }
+
+    function redirect_out_of_range(): void
+    {
+        // phpcs:ignore WordPress.Security.SafeRedirect.wp_redirect_wp_redirect -- The image might be hosted somewhere else.
+        wp_redirect(get_option('osm_tiles_proxy_out_of_range_image_url', OSM_PROXY_BASE_URL . 'assets/out_of_range.png'), 302);
+        die;
+    }
+
+    function enqueue_admin_scripts($hook): void
+    {
+        if ('plugins.php' === $hook) {
+            wp_enqueue_script('wp-api-fetch');
+        }
     }
 
     function get_osm_remote_url($s, $z, $x, $y)
@@ -192,53 +286,56 @@ class Proxy
         ob_start();
         ?>
         <section class="notice notice-info" style="display: block;padding: 10px; margin-top: 5px;">
-            <strong><?php _e('Usage', 'osm-tiles-proxy') ?></strong>
+            <strong><?php esc_html_e('Usage', 'osm-tiles-proxy') ?></strong>
             <p>
-                <?php _e('Configure your OSM plugin to use the following urls instead.', 'osm-tiles-proxy') ?>
+                <?php esc_html_e('Configure your OSM plugin to use the following urls instead.', 'osm-tiles-proxy') ?>
             </p>
             <table>
                 <?php if ($this->cache_enabled) { ?>
                     <tr>
-                        <th><?php _e('Tiles url (Caching)', 'osm-tiles-proxy') ?></th>
-                        <td><?php echo apply_filters('osm_tiles_proxy_get_proxy_url', '') ?></td>
+                        <th><?php esc_html_e('Tiles url (Caching)', 'osm-tiles-proxy') ?></th>
+                        <td><?php echo esc_html(apply_filters('osm_tiles_proxy_get_proxy_url', '')) ?></td>
                     </tr>
                 <?php } ?>
                 <?php if ($this->rest_api_enabled) {
                     ?>
                     <tr>
-                        <th><?php _e('Tiles url (REST API)', 'osm-tiles-proxy') ?></th>
-                        <td><?php echo apply_filters('osm_tiles_proxy_get_proxy_rest_url', '') ?></td>
+                        <th><?php esc_html_e('Tiles url (REST API)', 'osm-tiles-proxy') ?></th>
+                        <td><?php echo esc_html(apply_filters('osm_tiles_proxy_get_proxy_rest_url', '')) ?></td>
                     </tr>
                 <?php } ?>
 
                 <tr>
-                    <th><?= __('Leaflet JS', 'osm-tiles-proxy') ?></th>
-                    <td><?= apply_filters('osm_tiles_proxy_get_leaflet_js_url', '') ?></td>
+                    <th><?= esc_html__('Leaflet JS', 'osm-tiles-proxy') ?></th>
+                    <td><?= esc_html(apply_filters('osm_tiles_proxy_get_leaflet_js_url', '')) ?></td>
                 </tr>
                 <tr>
-                    <th><?= __('Leaflet CSS', 'osm-tiles-proxy') ?></th>
-                    <td><?= apply_filters('osm_tiles_proxy_get_leaflet_css_url', '') ?></td>
+                    <th><?= esc_html__('Leaflet CSS', 'osm-tiles-proxy') ?></th>
+                    <td><?= esc_html(apply_filters('osm_tiles_proxy_get_leaflet_css_url', '')) ?></td>
                 </tr>
                 <tr>
-                    <th><?= __('Remote tiles server', 'osm-tiles-proxy') ?></th>
-                    <td><?= $this->osm_url ?></td>
+                    <th><?= esc_html__('Remote tiles server', 'osm-tiles-proxy') ?></th>
+                    <td><?= esc_html($this->osm_url) ?></td>
                 </tr>
                 <tr>
-                    <th><?= __('Current cache size', 'osm-tiles-proxy') ?></th>
+                    <th><?= esc_html__('Current cache size', 'osm-tiles-proxy') ?></th>
                     <td style="display: flex; align-items: center; gap: 1ch;">
                         <span class="osm-proxy-cache-size">
-                        <?= size_format(get_dirsize(WP_CONTENT_DIR . '/cache/osm-tiles')) ?: '0 MB' ?>
+                        <?= esc_html(size_format(get_dirsize(WP_CONTENT_DIR . '/cache/osm-tiles')) ?: '0 MB') ?>
                        </span>
                         <button type="button" class="button action"
-                                onclick="osm_proxy_clear_cache()"><?= __('Clear cache', 'osm-tiles-proxy') ?>
+                                onclick="osm_proxy_clear_cache()"><?= esc_html__('Clear cache', 'osm-tiles-proxy') ?>
                         </button>
                     </td>
                 </tr>
             </table>
 
             <p>
-                <?= sprintf(__('Like the plugin? <a target="_blank" href="%s">Donate</a>.', 'osm-tiles-proxy'),
-                        OSM_PROXY_DONATION_URL) ?>
+                <?php
+                /* translators: %s: Donation url */
+                echo wp_kses_post(sprintf(__('Like the plugin? <a target="_blank" href="%s">Donate</a>.', 'osm-tiles-proxy'),
+                        esc_url(OSM_PROXY_DONATION_URL)));
+                ?>
             </p>
         </section>
         <script>
@@ -284,11 +381,11 @@ class Proxy
         }
         $objects = scandir($directory);
         foreach ($objects as $object) {
-            if ($object != "." && $object != "..") {
+            if ("." !== $object && ".." !== $object) {
                 if (is_dir($directory . DIRECTORY_SEPARATOR . $object) && !is_link($directory . "/" . $object)) {
                     $this->rrmdir($directory . DIRECTORY_SEPARATOR . $object);
                 } else {
-                    unlink($directory . DIRECTORY_SEPARATOR . $object);
+                    wp_delete_file($directory . DIRECTORY_SEPARATOR . $object);
                 }
             }
         }
