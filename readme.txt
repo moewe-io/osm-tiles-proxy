@@ -1,5 +1,5 @@
 === Tiles Proxy for OpenStreetMap ===
-Contributors: adrian2k7,moewe, creabrain
+Contributors: adrian2k7,moewe, creabrain, ymichel
 Tags: openstreetmap, embed, gdpr, proxy
 Donate link: https://www.paypal.com/paypalme/scrobbleme
 Requires at least: 6.0
