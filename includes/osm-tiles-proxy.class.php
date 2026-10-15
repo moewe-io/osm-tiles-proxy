@@ -107,6 +107,18 @@ class Proxy
 
         $download_target = $base_path . '/' . $matches['s'] . '/' . $zoom . '/' . $x . '/';
 
+        // A request for an already cached tile reaching WordPress means the web server doesn't deliver the file itself.
+        // Deliver it directly instead of downloading and redirecting again.
+        $cached_tile = $download_target . $y . '.png';
+        if (wp_filesize($cached_tile)) {
+            status_header(200);
+            header('Content-Type: image/png');
+            header('Content-Length: ' . wp_filesize($cached_tile));
+            header('Cache-Control: public, max-age=604800'); // 1 week, same as the REST API
+            readfile($cached_tile);
+            die;
+        }
+
         wp_mkdir_p($download_target);
         $download_target = $download_target . '/' . $y . '.png';
 
