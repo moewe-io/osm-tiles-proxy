@@ -19,6 +19,7 @@ define('OSM_PROXY_BASE_DIR', __DIR__ . DIRECTORY_SEPARATOR);
 
 const OSM_PROXY_DEFAULT_TILE_SERVER_URL = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
 const OSM_PROXY_DONATION_URL = 'https://www.paypal.com/paypalme/scrobbleme/5';
+const OSM_PROXY_AFFILIATE_URL_WP_SPEED_OF_LIGHT = 'https://www.joomunited.com/wordpress-products/wp-speed-of-light?atid=867';
 
 include "includes/osm-tiles-proxy.class.php";
 include "includes/osm-tiles-proxy.customizer-class.php";

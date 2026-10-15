@@ -130,7 +130,7 @@ class Proxy
     /**
      * @param $request WP_REST_Request
      */
-    function get_osm_tile($request)
+    function get_osm_tile(WP_REST_Request $request): void
     {
         $remote_url = $this->get_osm_remote_url($request->get_param('s'), $request->get_param('z'), $request->get_param('x'), $request->get_param('y'));
         header('Content-Description: File Transfer');
@@ -184,7 +184,7 @@ class Proxy
      *
      * @return array Links including new ones.
      */
-    function init_row_meta($links, $file): array
+    function init_row_meta(array $links, string $file): array
     {
         if (!str_contains($file, 'osm-tiles-proxy.php')) {
             return $links;
@@ -237,8 +237,8 @@ class Proxy
             </table>
 
             <p>
-                <?= sprintf(__('Like the plugin? <a target="_blank" href="%s">Donate</a>.', 'osm-tiles-proxy'),
-                        OSM_PROXY_DONATION_URL) ?>
+                <?= sprintf(__('Like the plugin? <a target="_blank" href="%s">Donate</a> or buy WP Speed of Link with our <a target="_blank" href="%s">affiliate link</a>.', 'osm-tiles-proxy'),
+                        OSM_PROXY_DONATION_URL, OSM_PROXY_AFFILIATE_URL_WP_SPEED_OF_LIGHT) ?>
             </p>
         </section>
         <script>
@@ -278,7 +278,6 @@ class Proxy
     // Thanks: https://stackoverflow.com/a/3338133/1165132
     function rrmdir($directory): void
     {
-
         if (!is_dir($directory)) {
             return;
         }
