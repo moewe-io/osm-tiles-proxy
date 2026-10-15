@@ -31,6 +31,6 @@ add_action('wp_enqueue_scripts', 'osm_tiles_proxy_register_leaflet');
 
 function osm_tiles_proxy_register_leaflet(): void
 {
-    wp_register_style('leaflet-js', apply_filters('osm_tiles_proxy_get_leaflet_js_url', false), false, '1.9.4');
-    wp_register_script('leaflet-js', apply_filters('osm_tiles_proxy_get_leaflet_css_url', false), array(), '1.9.4');
+    wp_register_style('leaflet-js', apply_filters('osm_tiles_proxy_get_leaflet_css_url', false), false, '1.9.4');
+    wp_register_script('leaflet-js', apply_filters('osm_tiles_proxy_get_leaflet_js_url', false), array(), '1.9.4');
 }
