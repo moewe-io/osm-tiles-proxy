@@ -236,7 +236,7 @@ class Proxy
                 </tr>
                 <tr>
                     <th><?= __('Remote tiles server', 'osm-tiles-proxy') ?></th>
-                    <td><?= $this->osm_url ?></td>
+                    <td><?= esc_html($this->osm_url) ?></td>
                 </tr>
                 <tr>
                     <th><?= __('Current cache size', 'osm-tiles-proxy') ?></th>
