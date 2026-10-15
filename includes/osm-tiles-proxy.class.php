@@ -110,13 +110,19 @@ class Proxy
         wp_mkdir_p($download_target);
         $download_target = $download_target . '/' . $y . '.png';
 
-        wp_remote_get($download_url, array(
+        $response = wp_remote_get($download_url, array(
                 'timeout' => 300,
                 'stream' => true,
                 'filename' => $download_target
         ));
 
-        if (!wp_filesize($download_target)) {
+        // Error responses of the tiles server have a body too, so they must not be kept as tile
+        $content_type = is_wp_error($response) ? '' : wp_remote_retrieve_header($response, 'content-type');
+        $is_tile = !is_wp_error($response)
+                && 200 === wp_remote_retrieve_response_code($response)
+                && is_string($content_type) && str_starts_with($content_type, 'image/');
+
+        if (!$is_tile || !wp_filesize($download_target)) {
             wp_delete_file($download_target);
             $error_image = get_option('osm_tiles_proxy_download_error_image_url', OSM_PROXY_BASE_URL . 'assets/download_error.png');
             wp_redirect($error_image, 307);
