@@ -110,13 +110,19 @@ class Proxy
         wp_mkdir_p($download_target);
         $download_target = $download_target . '/' . $y . '.png';
 
-        wp_remote_get($download_url, array(
+        $response = wp_remote_get($download_url, array(
                 'timeout' => 300,
                 'stream' => true,
                 'filename' => $download_target
         ));
 
-        if (!wp_filesize($download_target)) {
+        // Error responses of the tiles server have a body too, so they must not be kept as tile
+        $content_type = is_wp_error($response) ? '' : wp_remote_retrieve_header($response, 'content-type');
+        $is_tile = !is_wp_error($response)
+                && 200 === wp_remote_retrieve_response_code($response)
+                && is_string($content_type) && str_starts_with($content_type, 'image/');
+
+        if (!$is_tile || !wp_filesize($download_target)) {
             wp_delete_file($download_target);
             $error_image = get_option('osm_tiles_proxy_download_error_image_url', OSM_PROXY_BASE_URL . 'assets/download_error.png');
             wp_redirect($error_image, 307);
@@ -133,10 +139,19 @@ class Proxy
     function get_osm_tile(WP_REST_Request $request): void
     {
         $remote_url = $this->get_osm_remote_url($request->get_param('s'), $request->get_param('z'), $request->get_param('x'), $request->get_param('y'));
+        // wp_remote_get() sends a User-Agent, without one tile.openstreetmap.org answers with an "Access blocked" tile
+        $response = wp_remote_get($remote_url);
+
+        if (is_wp_error($response) || 200 !== wp_remote_retrieve_response_code($response)) {
+            $error_image = get_option('osm_tiles_proxy_download_error_image_url', OSM_PROXY_BASE_URL . 'assets/download_error.png');
+            wp_redirect($error_image, 307);
+            die;
+        }
+
         header('Content-Description: File Transfer');
         header('Content-Type: image/png');
         header('Cache-Control: public, max-age=604800'); // 1 week for no specific reason
-        readfile($remote_url);
+        echo wp_remote_retrieve_body($response);
     }
 
     function get_osm_remote_url($s, $z, $x, $y)
@@ -221,7 +236,7 @@ class Proxy
                 </tr>
                 <tr>
                     <th><?= __('Remote tiles server', 'osm-tiles-proxy') ?></th>
-                    <td><?= $this->osm_url ?></td>
+                    <td><?= esc_html($this->osm_url) ?></td>
                 </tr>
                 <tr>
                     <th><?= __('Current cache size', 'osm-tiles-proxy') ?></th>

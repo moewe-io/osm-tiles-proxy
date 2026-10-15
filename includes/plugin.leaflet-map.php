@@ -3,7 +3,7 @@
  * This enables direct integration for https://de.wordpress.org/plugins/leaflet-map/
  */
 if (defined('OSM_PROXY_DISABLE_PLUGIN_LEAFMAP_MAP_INTEGRATION')
-    && !OSM_PROXY_DISABLE_PLUGIN_LEAFMAP_MAP_INTEGRATION) {
+    && OSM_PROXY_DISABLE_PLUGIN_LEAFMAP_MAP_INTEGRATION) {
     return;
 }
 
