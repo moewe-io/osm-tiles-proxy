@@ -17,7 +17,8 @@ class Customizer
     function customize_register(\WP_Customize_Manager $wp_customize): void
     {
 
-        $max_x_y = pow(2, absint(get_option('osm_tiles_proxy_max_zoom', 20))) - 1;
+        // X and y restrictions are coordinates at zoom level 12
+        $max_x_y = pow(2, 12) - 1;
 
         $wp_customize->add_section('osm_tiles_proxy_section', array(
             'title' => __('OSM Tiles Proxy', 'osm-tiles-proxy'),

@@ -86,7 +86,8 @@ class Proxy
             die;
         }
 
-        $max_x_y = pow(2, $max_zoom) - 1;
+        // X and y restrictions are coordinates at zoom level 12. The number of tiles is used as default, so nothing is restricted at any zoom level.
+        $max_x_y = pow(2, 12);
         // Tiles will always be downloaded, if current zoom <= unrestricted zoom
         $unrestricted_zoom = apply_filters('osm-tiles-proxy/get-unrestricted-zoom', 6);
 
