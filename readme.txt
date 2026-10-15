@@ -1,11 +1,11 @@
 === Tiles Proxy for OpenStreetMap ===
-Contributors: adrian2k7,moewe, creabrain
+Contributors: adrian2k7,moewe,ymichel,sachsentours
 Tags: openstreetmap, embed, gdpr, proxy
 Donate link: https://www.paypal.com/paypalme/scrobbleme
 Requires at least: 6.0
-Requires PHP: 8.0
-Tested up to: 7.0
-Stable tag: 2.4.0
+Requires PHP: 8.1
+Tested up to: 7.1.3
+Stable tag: 2.4.1
 License: GPL v3
 License URI: http://www.gnu.org/copyleft/gpl.html
 
@@ -21,16 +21,15 @@ Tiles Proxy for OpenStreetMap provides a basic proxy, which allows other OpenStr
 
 **Known to work with these plugins**
 
+* [Geolocation](https://wordpress.org/plugins/geolocation/)
 * [Leaflet Map](https://de.wordpress.org/plugins/leaflet-map/)
   * If Leaflet Map is using the default settings, the proxy is automatically used.
 * [Custom Post Type to Map Store](https://wordpress.org/plugins/cpt-to-map-store/)
-* [Geolocation](https://wordpress.org/plugins/geolocation/)
 * Another plugin? Let us [know](https://wordpress.org/support/plugin/osm-tiles-proxy).
 
 **Notes**
 
 * *Beware*: Depending on your map and the tiles you need, a lot of storage is needed.
-* Might be slower than official servers (depends on your server)
 * First requests might be slow as map tiles are cached on request
 
 **Filters**
@@ -67,6 +66,12 @@ Nothing special
 3. Customizer overview
 
 == Changelog ==
+
+= 2.4.1 (2026-10-15) =
+
+* Some issues have been fixed. Thanks to @ymichel + Claude for reporting them and providing the fixes.
+* Require PHP 8.1, we urge everyone to keep PHP updated
+  * With the next release, we will start requiring a PHP version which is not EOL.
 
 = 2.4.0 (2026-03-27) =
 

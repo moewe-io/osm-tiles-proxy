@@ -3,9 +3,9 @@
  * Plugin Name: Tiles Proxy for OpenStreetMap
  * Plugin URI: https://wordpress.org/plugins/osm-tiles-proxy
  * Description: Helper plugin for embedding OpenStreetMaps
- * Version: 2.4.0
+ * Version: 2.4.1
  * Requires at least: 6.0
- * Requires PHP: 8.0
+ * Requires PHP: 8.1
  * Author: Adrian Mörchen
  * Author URI: https://www.meine-infoseite.de/
  * Text Domain: osm-tiles-proxy
@@ -15,8 +15,8 @@ use MOEWE\OSM_Tiles_proxy\Customizer;
 use MOEWE\OSM_Tiles_proxy\Proxy;
 
 define('OSM_PROXY_BASE_URL', plugins_url('/', __FILE__));
-define('OSM_PROXY_BASE_DIR', __DIR__ . DIRECTORY_SEPARATOR);
 
+const OSM_PROXY_BASE_DIR = __DIR__ . DIRECTORY_SEPARATOR;
 const OSM_PROXY_DEFAULT_TILE_SERVER_URL = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
 const OSM_PROXY_DONATION_URL = 'https://www.paypal.com/paypalme/scrobbleme/5';
 const OSM_PROXY_AFFILIATE_URL_WP_SPEED_OF_LIGHT = 'https://www.joomunited.com/wordpress-products/wp-speed-of-light?atid=867';
