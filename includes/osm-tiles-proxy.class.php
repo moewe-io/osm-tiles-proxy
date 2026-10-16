@@ -90,11 +90,14 @@ class Proxy
         // Tiles will always be downloaded, if current zoom <= unrestricted zoom
         $unrestricted_zoom = apply_filters('osm-tiles-proxy/get-unrestricted-zoom', 6);
 
+        // A tile at zoom level 12 covers several tiles at higher zoom levels. The max. values must include all of them.
+        $covered_tiles = $zoom > 12 ? pow(2, $zoom - 12) : 1;
+
         $min_x = floor($this->get_real_x_y(get_option('osm_tiles_proxy_min_x', 0), $zoom));
-        $max_x = ceil($this->get_real_x_y(get_option('osm_tiles_proxy_max_x', $max_x_y), $zoom));
+        $max_x = ceil($this->get_real_x_y(get_option('osm_tiles_proxy_max_x', $max_x_y), $zoom)) + $covered_tiles - 1;
 
         $min_y = floor($this->get_real_x_y(get_option('osm_tiles_proxy_min_y', 0), $zoom));
-        $max_y = ceil($this->get_real_x_y(get_option('osm_tiles_proxy_max_y', $max_x_y), $zoom));
+        $max_y = ceil($this->get_real_x_y(get_option('osm_tiles_proxy_max_y', $max_x_y), $zoom)) + $covered_tiles - 1;
 
 
         if ($zoom > $unrestricted_zoom && ($x > $max_x || $x < $min_x || $y > $max_y || $y < $min_y)) {
