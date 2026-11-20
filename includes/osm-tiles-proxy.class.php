@@ -107,6 +107,17 @@ class Proxy
 
         $download_target = $base_path . '/' . $matches['s'] . '/' . $zoom . '/' . $x . '/';
 
+        // The web server didn't deliver an already cached tile itself, so do it here.
+        // Files which are no image (e.g. error responses cached before 2.4.1) are downloaded again.
+        $cached_tile = $download_target . $y . '.png';
+        if (wp_filesize($cached_tile)) {
+            $cached_type = wp_get_image_mime($cached_tile);
+            if ($cached_type) {
+                $this->send_tile($cached_tile, $cached_type);
+            }
+            wp_delete_file($cached_tile);
+        }
+
         wp_mkdir_p($download_target);
         $download_target = $download_target . '/' . $y . '.png';
 
@@ -129,7 +140,17 @@ class Proxy
             die;
         }
 
-        wp_redirect(add_query_arg('retry', '1', home_url($wp->request)));
+        // The download has been checked above, so deliver it directly instead of redirecting to it
+        $this->send_tile($download_target, $content_type);
+    }
+
+    private function send_tile(string $file, string $content_type): void
+    {
+        status_header(200);
+        header('Content-Type: ' . $content_type);
+        header('Content-Length: ' . wp_filesize($file));
+        header('Cache-Control: public, max-age=604800'); // 1 week, same as the REST API
+        readfile($file);
         die;
     }
 
