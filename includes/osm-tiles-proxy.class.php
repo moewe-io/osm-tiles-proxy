@@ -77,9 +77,15 @@ class Proxy
         $max_zoom = get_option('osm_tiles_proxy_max_zoom', 20);
 
         $matches = $matches[0];
-        $zoom = max(0, min(20, $matches['z'])); // OSM is always 0 to 20
+        $zoom = (int)$matches['z'];
         $x = $matches['x'];
         $y = $matches['y'];
+
+        // Only existing tiles can be downloaded: zoom 0 to 20, x and y below 2^zoom
+        if ($zoom > 20 || $x >= pow(2, $zoom) || $y >= pow(2, $zoom)) {
+            wp_redirect($out_of_range_url, 302);
+            die;
+        }
 
         if ($zoom > $max_zoom || $zoom < $min_zoom) {
             wp_redirect($out_of_range_url, 302);
