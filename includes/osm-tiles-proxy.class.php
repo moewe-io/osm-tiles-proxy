@@ -73,6 +73,13 @@ class Proxy
 
         $out_of_range_url = get_option('osm_tiles_proxy_out_of_range_image_url', OSM_PROXY_BASE_URL . 'assets/out_of_range.png');
 
+        // The default tiles server only knows the subdomains a, b and c. An empty list allows every subdomain.
+        $subdomains = apply_filters('osm_tiles_proxy_allowed_subdomains', OSM_PROXY_DEFAULT_TILE_SERVER_URL === $this->osm_url ? ['a', 'b', 'c'] : []);
+        if ($subdomains && !in_array($matches[0]['s'], $subdomains, true)) {
+            wp_redirect($out_of_range_url, 302);
+            die;
+        }
+
         $min_zoom = get_option('osm_tiles_proxy_min_zoom', 0);
         $max_zoom = get_option('osm_tiles_proxy_max_zoom', 20);
 
